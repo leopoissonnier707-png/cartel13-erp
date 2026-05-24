@@ -11,7 +11,7 @@ const REDIRECT_URI          = process.env.REDIRECT_URI          || 'https://cart
 const SUPABASE_URL          = process.env.SUPABASE_URL          || 'https://ndrhccebzzcomwikzrdo.supabase.co';
 const SUPABASE_KEY          = process.env.SUPABASE_KEY          || '';
 const DISCORD_WEBHOOK       = process.env.DISCORD_WEBHOOK       || 'https://discord.com/api/webhooks/1508029444302831791/RyCpp9C7fbHiuY9ut0n6EoRyJUuEVQyKZD9ylu4vg3jib8pK-V3-i4bYgIRBVn2mUS18';
-const BOT_TOKEN             = process.env.BOT_TOKEN             || 'MTUwNzUwMjA1OTk3MTE1Mzk3MA.Gmwbyo.qGuWMLSM2xA9pTEn93NdPIYNXKkN_8TDleOiY8';
+
 const CARTEL_ROLE_ID        = process.env.CARTEL_ROLE_ID        || '1508107733600047115';
 const GUILD_ID              = process.env.GUILD_ID              || '1487519238267600919';
 const OWNER_ID              = '1370496502425845856';
