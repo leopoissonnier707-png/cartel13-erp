@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Cartel 13 — ERP</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0a0a0a;--bg2:#111;--bg3:#161616;--bg4:#1e1e1e;--red:#c0392b;--red2:#e74c3c;--gold:#c9a84c;--text:#e8e8e8;--text2:#aaa;--text3:#555;--border:#1e1e1e;--border2:#2a2a2a;--success:#27ae60;--warn:#e67e22;--info:#2980b9}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--red)}
+/* SIDEBAR */
+.sidebar{width:255px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100}
+.s-logo{padding:24px 20px 18px;border-bottom:1px solid var(--border)}
+.s-logo .name{font-family:'Bebas Neue',sans-serif;font-size:38px;letter-spacing:3px;line-height:1}.s-logo .name span{color:var(--red)}
+.s-logo .tag{font-size:9px;letter-spacing:5px;color:var(--text3);text-transform:uppercase;font-family:'Oswald',sans-serif;margin-top:2px}
+.s-user{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.s-avatar{width:40px;height:40px;border-radius:50%;border:2px solid var(--red);overflow:hidden;flex-shrink:0;background:var(--bg4)}
+.s-avatar img{width:100%;height:100%;object-fit:cover}
+.s-uname{font-size:13px;font-weight:500}
+.s-role{font-size:10px;letter-spacing:2px;text-transform:uppercase;font-family:'Oswald',sans-serif;color:var(--red)}
+.s-nav{flex:1;padding:12px 0;overflow-y:auto}
+.s-section{padding:8px 20px 4px;font-size:9px;letter-spacing:4px;color:var(--text3);text-transform:uppercase;font-family:'Oswald',sans-serif;margin-top:6px}
+.s-item{display:flex;align-items:center;gap:10px;padding:10px 20px;color:var(--text2);cursor:pointer;transition:all .15s;font-size:13px;border-left:2px solid transparent}
+.s-item:hover{background:var(--bg3);color:var(--text);border-left-color:var(--border2)}
+.s-item.active{background:rgba(192,57,43,.08);color:var(--red);border-left-color:var(--red)}
+.s-badge{margin-left:auto;background:var(--red);color:#fff;font-size:10px;padding:2px 6px;border-radius:10px;font-weight:700}
+.s-footer{padding:14px 20px;border-top:1px solid var(--border)}
+.s-logout{display:flex;align-items:center;gap:8px;color:var(--text3);font-size:12px;cursor:pointer;background:none;border:none;width:100%;transition:color .15s}
+.s-logout:hover{color:var(--red)}
+/* MAIN */
+.main{margin-left:255px;display:flex;flex-direction:column;min-height:100vh}
+.topbar{height:56px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:50}
+.tb-title{font-family:'Oswald',sans-serif;font-size:17px;letter-spacing:2px;font-weight:500}
+.tb-right{display:flex;align-items:center;gap:12px;font-size:12px;color:var(--text3);font-family:'Oswald',sans-serif;letter-spacing:1px}
+.page{padding:28px;flex:1}
+/* CARDS */
+.card{background:var(--bg2);border:1px solid var(--border);padding:22px;margin-bottom:18px}
+.card-title{font-family:'Oswald',sans-serif;font-size:14px;letter-spacing:2px;text-transform:uppercase;margin-bottom:18px;color:var(--text2)}
+.card-title span{color:var(--red)}
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+.stat{background:var(--bg2);border:1px solid var(--border);padding:18px;position:relative;overflow:hidden}
+.stat::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--c,var(--red))}
+.stat-n{font-family:'Bebas Neue',sans-serif;font-size:48px;line-height:1}
+.stat-l{font-size:10px;letter-spacing:3px;color:var(--text3);text-transform:uppercase;font-family:'Oswald',sans-serif;margin-top:4px}
+/* BTN */
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border:1px solid;font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:1px;cursor:pointer;transition:all .15s;text-transform:uppercase}
+.btn-p{background:var(--red);border-color:var(--red);color:#fff}.btn-p:hover{background:var(--red2)}
+.btn-o{background:transparent;border-color:var(--border2);color:var(--text2)}.btn-o:hover{border-color:var(--red);color:var(--red)}
+.btn-s{background:var(--success);border-color:var(--success);color:#fff}
+.btn-d{background:var(--warn);border-color:var(--warn);color:#fff}
+.btn-x{background:#c0392b;border-color:#c0392b;color:#fff}
+.btn-sm{padding:5px 12px;font-size:11px}
+/* TABLE */
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;padding:9px 12px;font-size:9px;letter-spacing:3px;color:var(--text3);text-transform:uppercase;font-family:'Oswald',sans-serif;border-bottom:1px solid var(--border);font-weight:400}
+td{padding:11px 12px;font-size:12px;border-bottom:1px solid var(--border);color:var(--text2)}
+tr:hover td{background:var(--bg3);color:var(--text)}
+/* BADGE */
+.badge{display:inline-block;padding:2px 8px;font-size:9px;letter-spacing:1px;text-transform:uppercase;font-family:'Oswald',sans-serif}
+.b-pend{background:rgba(230,126,34,.15);color:var(--warn);border:1px solid rgba(230,126,34,.3)}
+.b-acc{background:rgba(39,174,96,.15);color:var(--success);border:1px solid rgba(39,174,96,.3)}
+.b-del{background:rgba(41,128,185,.15);color:#3498db;border:1px solid rgba(41,128,185,.3)}
+.b-ref{background:rgba(192,57,43,.15);color:var(--red);border:1px solid rgba(192,57,43,.3)}
+.b-adm{background:rgba(192,57,43,.2);color:var(--red2);border:1px solid rgba(192,57,43,.4)}
+.b-mem{background:rgba(41,128,185,.1);color:#5dade2;border:1px solid rgba(41,128,185,.3)}
+/* FORM */
+.fg{margin-bottom:14px}
+.fl{display:block;font-size:9px;letter-spacing:3px;color:var(--text3);text-transform:uppercase;font-family:'Oswald',sans-serif;margin-bottom:7px}
+.fi{width:100%;background:var(--bg3);border:1px solid var(--border2);color:var(--text);padding:10px 12px;font-size:13px;font-family:'Inter',sans-serif;outline:none;transition:border-color .15s}
+.fi:focus{border-color:var(--red)}
+.fi::placeholder{color:var(--text3)}
+select.fi{cursor:pointer}select.fi option{background:var(--bg3)}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+/* MODAL */
+.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-ov.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border2);width:100%;max-width:520px;max-height:88vh;overflow-y:auto;position:relative}
+.modal::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--red),transparent)}
+.mh{padding:22px 24px 0;display:flex;align-items:center;justify-content:space-between}
+.mt{font-family:'Oswald',sans-serif;font-size:16px;letter-spacing:2px;text-transform:uppercase}
+.mc{background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px;padding:4px;transition:color .15s;line-height:1}.mc:hover{color:var(--red)}
+.mb{padding:22px 24px 26px}
+/* TABS */
+.tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:22px}
+.tab{padding:11px 18px;font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:1px;cursor:pointer;color:var(--text3);border-bottom:2px solid transparent;transition:all .15s;text-transform:uppercase;margin-bottom:-1px}
+.tab.active{color:var(--red);border-bottom-color:var(--red)}
+.tab:hover:not(.active){color:var(--text)}
+/* TOAST */
+.toast-c{position:fixed;bottom:20px;right:20px;z-index:9000;display:flex;flex-direction:column;gap:8px}
+.toast{background:var(--bg2);border:1px solid var(--border2);border-left:3px solid var(--red);padding:12px 16px;font-size:12px;min-width:240px;animation:tin .3s ease}
+@keyframes tin{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+.toast.ok{border-left-color:var(--success)}.toast.warn{border-left-color:var(--warn)}.toast.info{border-left-color:var(--info)}
+/* PRODUCTS */
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+.pcard{background:var(--bg2);border:1px solid var(--border);overflow:hidden;cursor:pointer;transition:all .2s}
+.pcard:hover{border-color:var(--red);transform:translateY(-2px)}
+.pimg{height:150px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:48px;position:relative;overflow:hidden}
+.pimg img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.pcat{position:absolute;top:8px;left:8px;background:rgba(0,0,0,.75);border:1px solid var(--border2);padding:2px 7px;font-size:9px;letter-spacing:2px;text-transform:uppercase;font-family:'Oswald',sans-serif;color:var(--text2)}
+.pinfo{padding:14px}
+.pname{font-family:'Oswald',sans-serif;font-size:15px;font-weight:500;letter-spacing:1px;margin-bottom:5px}
+.pdesc{font-size:11px;color:var(--text3);line-height:1.5;margin-bottom:10px}
+.pprice{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--gold)}
+/* LOG */
+.log-e{padding:9px 14px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:10px;font-size:12px}
+.log-t{color:var(--text3);flex-shrink:0;font-size:10px;min-width:130px}
+.log-txt{color:var(--text2);flex:1;line-height:1.5}
+.log-txt strong{color:var(--text)}
+/* EMPTY */
+.empty{text-align:center;padding:50px 20px;color:var(--text3)}
+.empty .ei{font-size:44px;margin-bottom:14px;opacity:.3}
+/* INFO BOX */
+.ib{background:var(--bg3);border:1px solid var(--border2);border-left:3px solid var(--info);padding:12px 16px;font-size:12px;color:var(--text2);margin-bottom:16px;line-height:1.6}
+.ib.warn{border-left-color:var(--warn)}.ib.ok{border-left-color:var(--success)}
+/* MEMBER ROW */
+.mrow{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.mrow:last-child{border-bottom:none}
+.mav{width:38px;height:38px;border-radius:50%;overflow:hidden;background:var(--bg4);flex-shrink:0;border:1px solid var(--border2)}
+.mav img{width:100%;height:100%;object-fit:cover}
+/* WALLPAPER */
+.wthumb{width:72px;height:46px;background-size:cover;background-position:center;border:2px solid transparent;cursor:pointer;transition:border-color .15s;background-color:var(--bg3)}
+.wthumb.sel{border-color:var(--red)}
+.wthumb:hover{border-color:var(--border2)}
+</style>
+</head>
+<body>
+<div class="toast-c" id="toasts"></div>
+<div class="modal-ov" id="modal-ov" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="mh"><div class="mt" id="modal-title"></div><button class="mc" onclick="closeModal()">✕</button></div>
+    <div class="mb" id="modal-body"></div>
+  </div>
+</div>
+
+<aside class="sidebar">
+  <div class="s-logo">
+    <div class="name">CARTEL<span>13</span></div>
+    <div class="tag">Nova Life ERP</div>
+  </div>
+  <div class="s-user">
+    <div class="s-avatar"><img id="s-av" src="" alt=""/></div>
+    <div><div class="s-uname" id="s-name">—</div><div class="s-role" id="s-role">—</div></div>
+  </div>
+  <nav class="s-nav" id="s-nav"></nav>
+  <div class="s-footer">
+    <button class="s-logout" onclick="location.href='/auth/logout'">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Déconnexion
+    </button>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="tb-title" id="tb-title">Chargement...</div>
+    <div class="tb-right" id="tb-time"></div>
+  </div>
+  <div class="page" id="page"></div>
+</main>
+
+<script>
+// ── STATE ──────────────────────────────────────────────
+let ME = null;
+let DATA = { categories:[], products:[], orders:[], members:[], logs:[], settings:{} };
+
+// ── INIT ───────────────────────────────────────────────
+async function init() {
+  try {
+    ME = await api('GET', '/api/me');
+    document.getElementById('s-av').src = ME.avatar;
+    document.getElementById('s-name').textContent = ME.username;
+    document.getElementById('s-role').textContent = ME.role === 'admin' ? 'Administrateur' : 'Membre';
+    buildNav();
+    await loadAll();
+    showPage(ME.role === 'admin' ? 'dashboard' : 'catalog');
+    setInterval(() => {
+      const el = document.getElementById('tb-time');
+      if(el) el.textContent = new Date().toLocaleTimeString('fr-FR');
+    }, 1000);
+  } catch(e) { location.href = '/'; }
+}
+
+async function loadAll() {
+  const [cats, prods, ords, settings] = await Promise.all([
+    api('GET','/api/categories'),
+    api('GET','/api/products'),
+    api('GET','/api/orders'),
+    api('GET','/api/settings'),
+  ]);
+  DATA.categories = cats || [];
+  DATA.products = prods || [];
+  DATA.orders = ords || [];
+  DATA.settings = settings || {};
+  if (ME.role === 'admin') {
+    const [members, logs] = await Promise.all([api('GET','/api/members'), api('GET','/api/logs')]);
+    DATA.members = members || [];
+    DATA.logs = logs || [];
+  }
+}
+
+// ── API ────────────────────────────────────────────────
+async function api(method, url, body) {
+  const res = await fetch(url, {
+    method,
+    headers: body ? {'Content-Type':'application/json'} : {},
+    body: body ? JSON.stringify(body) : undefined
+  });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+// ── NAV ────────────────────────────────────────────────
+function buildNav() {
+  const pending = DATA.orders.filter(o=>o.status==='pending').length;
+  let html = '';
+  html += `<div class="s-section">Boutique</div>`;
+  html += ni('catalog','📦','Catalogue');
+  html += ni('myorders','🛒','Mes commandes');
+  if (ME.role === 'admin') {
+    html += `<div class="s-section" style="margin-top:10px">Administration</div>`;
+    html += ni('dashboard','📊','Dashboard');
+    html += ni('orders','📋','Commandes', pending||'');
+    html += ni('products','🏪','Produits');
+    html += ni('members','👥','Membres');
+    html += ni('logs','📜','Logs');
+    html += ni('settings','⚙️','Paramètres');
+  }
+  document.getElementById('s-nav').innerHTML = html;
+}
+function ni(page, icon, label, badge='') {
+  return `<div class="s-item" id="nav-${page}" onclick="showPage('${page}')">${icon} ${label}${badge?`<span class="s-badge">${badge}</span>`:''}</div>`;
+}
+function setNav(page) {
+  document.querySelectorAll('.s-item').forEach(e=>e.classList.remove('active'));
+  const el = document.getElementById('nav-'+page);
+  if(el) el.classList.add('active');
+}
+
+// ── PAGES ──────────────────────────────────────────────
+const TITLES = {dashboard:'Dashboard',orders:'Commandes',catalog:'Catalogue',myorders:'Mes Commandes',products:'Produits',members:'Membres',logs:'Logs Système',settings:'Paramètres'};
+async function showPage(p) {
+  setNav(p);
+  document.getElementById('tb-title').textContent = TITLES[p]||p;
+  await loadAll();
+  buildNav();
+  const el = document.getElementById('page');
+  const pages = {dashboard:pageDashboard,orders:pageOrders,catalog:pageCatalog,myorders:pageMyOrders,products:pageProducts,members:pageMembers,logs:pageLogs,settings:pageSettings};
+  el.innerHTML = (pages[p]||pageDashboard)();
+}
+
+// ── DASHBOARD ──────────────────────────────────────────
+function pageDashboard() {
+  const o = DATA.orders;
+  return `
+  <div class="stats">
+    <div class="stat" style="--c:var(--red)"><div class="stat-n">${o.length}</div><div class="stat-l">Commandes</div></div>
+    <div class="stat" style="--c:var(--warn)"><div class="stat-n">${o.filter(x=>x.status==='pending').length}</div><div class="stat-l">En attente</div></div>
+    <div class="stat" style="--c:var(--success)"><div class="stat-n">${o.filter(x=>x.status==='delivered').length}</div><div class="stat-l">Livrées</div></div>
+    <div class="stat" style="--c:var(--info)"><div class="stat-n">${DATA.members.filter(m=>!m.banned).length}</div><div class="stat-l">Membres</div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
+    <div class="card">
+      <div class="card-title">Dernières <span>commandes</span></div>
+      <div class="tw"><table>
+        <thead><tr><th>ID</th><th>Client</th><th>Produit</th><th>Statut</th></tr></thead>
+        <tbody>${DATA.orders.slice(0,5).map(o=>`<tr>
+          <td style="color:var(--red);font-family:'Oswald',sans-serif">${o.order_id||o.id}</td>
+          <td>${o.username||o.rp_name}</td>
+          <td>${o.product_name}</td>
+          <td>${bs(o.status)}</td>
+        </tr>`).join('')||'<tr><td colspan="4" style="text-align:center;color:var(--text3)">Aucune commande</td></tr>'}
+        </tbody>
+      </table></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Derniers <span>logs</span></div>
+      ${DATA.logs.slice(0,6).map(l=>`<div class="log-e">
+        <div class="log-t">${new Date(l.created_at).toLocaleTimeString('fr-FR')}</div>
+        <div class="log-txt"><strong>${l.user_name}</strong> — ${l.action}</div>
+      </div>`).join('')||'<div class="empty"><p>Aucun log</p></div>'}
+    </div>
+  </div>`;
+}
+
+// ── CATALOG ────────────────────────────────────────────
+function pageCatalog() {
+  const prods = DATA.products.filter(p=>p.available);
+  return `
+  <div style="display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap">
+    <button class="btn btn-o btn-sm" onclick="filterCat(0,this)">🏪 Tous</button>
+    ${DATA.categories.map(c=>`<button class="btn btn-o btn-sm" onclick="filterCat(${c.id},this)">${c.icon} ${c.name}</button>`).join('')}
+  </div>
+  <div class="pgrid" id="pgrid">${renderProds(prods)}</div>`;
+}
+function renderProds(prods) {
+  if(!prods.length) return `<div class="empty"><div class="ei">📦</div><p>Aucun produit disponible</p></div>`;
+  return prods.map(p=>{
+    const cat = DATA.categories.find(c=>c.id===p.category_id);
+    return `<div class="pcard" onclick="openOrder(${p.id})">
+      <div class="pimg">
+        ${p.image_url?`<img src="${p.image_url}" alt="${p.name}"/>`:''}
+        <span style="position:relative;z-index:1;font-size:40px;opacity:.4">${cat?cat.icon:'📦'}</span>
+        ${cat?`<span class="pcat">${cat.name}</span>`:''}
+      </div>
+      <div class="pinfo">
+        <div class="pname">${p.name}</div>
+        <div class="pdesc">${p.description||'Aucune description.'}</div>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div class="pprice">${Number(p.price).toLocaleString('fr-FR')} $<span style="font-size:11px;margin-left:4px">${p.currency==='dirty'?'💰':'💵'}</span></div>
+          <button class="btn btn-p btn-sm" onclick="event.stopPropagation();openOrder(${p.id})">Commander</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function filterCat(catId, el) {
+  document.querySelectorAll('.btn-o').forEach(b=>b.classList.remove('btn-p'));
+  el.classList.add('btn-p');
+  const prods = catId===0 ? DATA.products.filter(p=>p.available) : DATA.products.filter(p=>p.category_id===catId&&p.available);
+  document.getElementById('pgrid').innerHTML = renderProds(prods);
+}
+function openOrder(pid) {
+  const p = DATA.products.find(x=>x.id===pid);
+  if(!p) return;
+  openModal('Commander — '+p.name, `
+    <div class="ib">Remplissez vos informations RP pour passer commande.</div>
+    <div class="fg"><label class="fl">Prénom RP</label><input class="fi" id="o-rp" placeholder="Ton prénom en jeu"/></div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Téléphone RP</label><input class="fi" id="o-phone" placeholder="06 12 34 56 78"/></div>
+      <div class="fg"><label class="fl">Quantité</label><input class="fi" type="number" id="o-qty" value="1" min="1" oninput="updTotal(${p.price})"/></div>
+    </div>
+    <div class="fg"><label class="fl">Organisation / Groupe RP</label><input class="fi" id="o-group" placeholder="Ex: Cartel 13, Mafia..."/></div>
+    <div class="fg"><label class="fl">Note (optionnel)</label><textarea class="fi" id="o-note" rows="2" placeholder="Infos supplémentaires..."></textarea></div>
+    <div style="background:var(--bg3);border:1px solid var(--border2);padding:14px;margin-bottom:18px">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px"><span style="color:var(--text2)">Produit</span><span>${p.name}</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px"><span style="color:var(--text2)">Prix unit.</span><span>${Number(p.price).toLocaleString('fr-FR')} $ ${p.currency==='dirty'?'(sale)':'(propre)'}</span></div>
+      <div style="display:flex;justify-content:space-between;border-top:1px solid var(--border);padding-top:10px;margin-top:4px">
+        <span style="font-family:'Oswald',sans-serif">TOTAL</span>
+        <span id="o-total" style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--gold)">${Number(p.price).toLocaleString('fr-FR')} $</span>
+      </div>
+    </div>
+    <button class="btn btn-p" style="width:100%" onclick="submitOrder(${pid})">✅ Confirmer la commande</button>
+  `);
+}
+function updTotal(up) {
+  const q = parseInt(document.getElementById('o-qty')?.value)||1;
+  const el = document.getElementById('o-total');
+  if(el) el.textContent = (up*q).toLocaleString('fr-FR')+' $';
+}
+async function submitOrder(pid) {
+  const p = DATA.products.find(x=>x.id===pid);
+  const rp = document.getElementById('o-rp')?.value.trim();
+  const phone = document.getElementById('o-phone')?.value.trim();
+  const qty = parseInt(document.getElementById('o-qty')?.value)||1;
+  const group = document.getElementById('o-group')?.value.trim();
+  const note = document.getElementById('o-note')?.value.trim();
+  if(!rp||!phone||!group){toast('Remplissez tous les champs','warn');return;}
+  const oid = 'CMD-'+Date.now().toString().slice(-6);
+  await api('POST','/api/orders',{
+    order_id:oid, username:ME.username, user_id:ME.discord_id,
+    rp_name:rp, rp_group:group, phone,
+    product_id:pid, product_name:p.name,
+    quantity:qty, total:p.price*qty, currency:p.currency,
+    status:'pending', note
+  });
+  closeModal();
+  toast('Commande envoyée ! Vous recevrez une notification Discord.','ok');
+  await showPage('myorders');
+}
+
+// ── MY ORDERS ──────────────────────────────────────────
+function pageMyOrders() {
+  const ords = DATA.orders;
+  if(!ords.length) return `<div class="empty"><div class="ei">🛒</div><p>Aucune commande pour l'instant.</p><br/><button class="btn btn-p" onclick="showPage('catalog')">Voir le catalogue</button></div>`;
+  return `<div class="card">
+    <div class="card-title">Mes <span>Commandes</span></div>
+    <div class="tw"><table>
+      <thead><tr><th>ID</th><th>Produit</th><th>Qté</th><th>Total</th><th>Statut</th><th>Date</th></tr></thead>
+      <tbody>${ords.map(o=>`<tr>
+        <td style="color:var(--red);font-family:'Oswald',sans-serif">${o.order_id||o.id}</td>
+        <td>${o.product_name}</td>
+        <td>${o.quantity}</td>
+        <td style="font-family:'Oswald',sans-serif;color:var(--gold)">${Number(o.total).toLocaleString('fr-FR')} $</td>
+        <td>${bs(o.status)}</td>
+        <td style="font-size:11px;color:var(--text3)">${new Date(o.created_at).toLocaleString('fr-FR')}</td>
+      </tr>`).join('')}
+      </tbody>
+    </table></div>
+  </div>`;
+}
+
+// ── ORDERS ADMIN ───────────────────────────────────────
+function pageOrders() {
+  return `
+  <div class="tabs" id="otabs">
+    ${['all','pending','accepted','delivered','refused'].map((s,i)=>`<div class="tab${i===0?' active':''}" onclick="filterOrd('${s}',this)">${{all:'Toutes',pending:'En attente',accepted:'Acceptées',delivered:'Livrées',refused:'Refusées'}[s]}</div>`).join('')}
+  </div>
+  <div id="ot">${renderOrds('all')}</div>`;
+}
+function filterOrd(s,el){
+  document.querySelectorAll('#otabs .tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('ot').innerHTML = renderOrds(s);
+}
+function renderOrds(s) {
+  const ords = s==='all' ? DATA.orders : DATA.orders.filter(o=>o.status===s);
+  if(!ords.length) return `<div class="empty"><div class="ei">📋</div><p>Aucune commande</p></div>`;
+  return `<div class="card"><div class="tw"><table>
+    <thead><tr><th>ID</th><th>Client RP</th><th>Produit</th><th>Total</th><th>Statut</th><th>Assigné</th><th>Actions</th></tr></thead>
+    <tbody>${ords.map(o=>`<tr>
+      <td style="color:var(--red);font-family:'Oswald',sans-serif">${o.order_id||o.id}</td>
+      <td><div>${o.rp_name}</div><div style="font-size:10px;color:var(--text3)">${o.username} · 📞 ${o.phone}</div><div style="font-size:10px;color:var(--text3)">👥 ${o.rp_group}</div></td>
+      <td>${o.product_name} ×${o.quantity}</td>
+      <td style="font-family:'Oswald',sans-serif;color:var(--gold)">${Number(o.total).toLocaleString('fr-FR')} $</td>
+      <td>${bs(o.status)}</td>
+      <td style="font-size:11px;color:var(--text3)">${o.assigned_to||'—'}</td>
+      <td style="display:flex;gap:4px;flex-wrap:wrap">
+        ${o.status==='pending'?`<button class="btn btn-s btn-sm" onclick="acceptOrd('${o.order_id||o.id}')">✅</button><button class="btn btn-x btn-sm" onclick="refuseOrd('${o.order_id||o.id}')">✕</button>`:''}
+        ${o.status==='accepted'?`<button class="btn btn-o btn-sm" onclick="deliverOrd('${o.order_id||o.id}')">📦</button>`:''}
+      </td>
+    </tr>`).join('')}
+    </tbody>
+  </table></div></div>`;
+}
+async function acceptOrd(id) {
+  await api('PATCH',`/api/orders/${id}`,{status:'accepted',assigned_to:ME.username});
+  toast('Commande acceptée !','ok');
+  await showPage('orders');
+}
+async function refuseOrd(id) {
+  await api('PATCH',`/api/orders/${id}`,{status:'refused'});
+  toast('Commande refusée','warn');
+  await showPage('orders');
+}
+async function deliverOrd(id) {
+  await api('PATCH',`/api/orders/${id}`,{status:'delivered'});
+  toast('Commande livrée !','ok');
+  await showPage('orders');
+}
+
+// ── PRODUCTS ADMIN ─────────────────────────────────────
+function pageProducts() {
+  return `
+  <div style="display:flex;gap:10px;margin-bottom:18px">
+    <button class="btn btn-p" onclick="openAddProd()">+ Ajouter un produit</button>
+    <button class="btn btn-o" onclick="openManageCats()">⚙️ Catégories</button>
+  </div>
+  <div class="card">
+    <div class="card-title">Produits <span>(${DATA.products.length})</span></div>
+    <div class="tw"><table>
+      <thead><tr><th>Nom</th><th>Catégorie</th><th>Prix</th><th>Devise</th><th>Statut</th><th>Actions</th></tr></thead>
+      <tbody>${DATA.products.map(p=>{
+        const cat=DATA.categories.find(c=>c.id===p.category_id);
+        return `<tr>
+          <td><strong>${p.name}</strong></td>
+          <td>${cat?`${cat.icon} ${cat.name}`:'—'}</td>
+          <td style="color:var(--gold);font-family:'Oswald',sans-serif">${Number(p.price).toLocaleString('fr-FR')} $</td>
+          <td>${p.currency==='dirty'?'💰 Sale':'💵 Propre'}</td>
+          <td>${p.available?'<span class="badge b-acc">Dispo</span>':'<span class="badge b-ref">Indispo</span>'}</td>
+          <td style="display:flex;gap:4px">
+            <button class="btn btn-o btn-sm" onclick="openEditProd(${p.id})">✏️</button>
+            <button class="btn btn-o btn-sm" onclick="toggleProd(${p.id})">${p.available?'🚫':'✅'}</button>
+            <button class="btn btn-x btn-sm" onclick="deleteProd(${p.id})">🗑</button>
+          </td>
+        </tr>`;}).join('')||'<tr><td colspan="6" style="text-align:center;color:var(--text3)">Aucun produit</td></tr>'}
+      </tbody>
+    </table></div>
+  </div>`;
+}
+function prodForm(p){
+  return `
+    <div class="fr">
+      <div class="fg"><label class="fl">Nom</label><input class="fi" id="pf-n" value="${p?p.name:''}"/></div>
+      <div class="fg"><label class="fl">Catégorie</label>
+        <select class="fi" id="pf-c"><option value="">—</option>${DATA.categories.map(c=>`<option value="${c.id}" ${p&&p.category_id===c.id?'selected':''}>${c.icon} ${c.name}</option>`).join('')}</select>
+      </div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Prix ($)</label><input class="fi" type="number" id="pf-p" value="${p?p.price:0}"/></div>
+      <div class="fg"><label class="fl">Devise</label>
+        <select class="fi" id="pf-d">
+          <option value="dirty" ${p&&p.currency==='dirty'?'selected':''}>💰 Argent sale</option>
+          <option value="clean" ${p&&p.currency==='clean'?'selected':''}>💵 Argent propre</option>
+        </select>
+      </div>
+    </div>
+    <div class="fg"><label class="fl">Description</label><textarea class="fi" id="pf-ds" rows="2">${p?p.description||'':''}</textarea></div>
+    <div class="fg"><label class="fl">URL Image</label><input class="fi" id="pf-img" value="${p?p.image_url||'':''}" placeholder="https://..."/></div>
+    <button class="btn btn-p" style="width:100%;margin-top:6px" onclick="saveProd(${p?p.id:'null'})">${p?'💾 Enregistrer':'➕ Créer'}</button>`;
+}
+function openAddProd(){openModal('Nouveau produit',prodForm(null));}
+function openEditProd(id){openModal('Modifier produit',prodForm(DATA.products.find(p=>p.id===id)));}
+async function saveProd(id){
+  const body={name:document.getElementById('pf-n').value.trim(),category_id:parseInt(document.getElementById('pf-c').value)||null,price:parseInt(document.getElementById('pf-p').value)||0,currency:document.getElementById('pf-d').value,description:document.getElementById('pf-ds').value.trim(),image_url:document.getElementById('pf-img').value.trim()};
+  if(!body.name){toast('Entrez un nom','warn');return;}
+  if(id==='null'||!id){body.available=true;await api('POST','/api/products',body);}
+  else{await api('PATCH',`/api/products/${id}`,body);}
+  closeModal();toast('Produit sauvegardé !','ok');await showPage('products');
+}
+async function toggleProd(id){
+  const p=DATA.products.find(x=>x.id===id);
+  await api('PATCH',`/api/products/${id}`,{available:!p.available});
+  await showPage('products');
+}
+async function deleteProd(id){
+  if(!confirm('Supprimer ce produit ?'))return;
+  await api('DELETE',`/api/products/${id}`);
+  toast('Produit supprimé','warn');await showPage('products');
+}
+function openManageCats(){
+  openModal('Gérer les catégories',`
+    <div id="cl">${renderCats()}</div>
+    <hr style="border:none;border-top:1px solid var(--border);margin:16px 0"/>
+    <div class="fr">
+      <div class="fg"><label class="fl">Nom</label><input class="fi" id="cn-n" placeholder="Explosifs"/></div>
+      <div class="fg"><label class="fl">Icône</label><input class="fi" id="cn-i" placeholder="💣" maxlength="2"/></div>
+    </div>
+    <button class="btn btn-p" onclick="addCat()">+ Ajouter</button>
+  `);
+}
+function renderCats(){return DATA.categories.map(c=>`<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)"><span style="font-size:18px">${c.icon}</span><span style="flex:1;font-size:13px">${c.name}</span><button class="btn btn-x btn-sm" onclick="delCat(${c.id})">🗑</button></div>`).join('');}
+async function addCat(){
+  const n=document.getElementById('cn-n')?.value.trim(),i=document.getElementById('cn-i')?.value.trim()||'📁';
+  if(!n){toast('Entrez un nom','warn');return;}
+  await api('POST','/api/categories',{name:n,icon:i});
+  DATA.categories=await api('GET','/api/categories');
+  document.getElementById('cl').innerHTML=renderCats();
+  document.getElementById('cn-n').value='';toast('Catégorie ajoutée','ok');
+}
+async function delCat(id){
+  await api('DELETE',`/api/categories/${id}`);
+  DATA.categories=await api('GET','/api/categories');
+  document.getElementById('cl').innerHTML=renderCats();
+}
+
+// ── MEMBERS ────────────────────────────────────────────
+function pageMembers(){
+  return `
+  <div style="margin-bottom:18px"><button class="btn btn-p" onclick="openAddMember()">+ Ajouter par ID Discord</button></div>
+  <div class="card">
+    <div class="card-title">Membres <span>(${DATA.members.length})</span></div>
+    ${DATA.members.map(m=>`
+      <div class="mrow">
+        <div class="mav"><img src="${m.avatar||'https://cdn.discordapp.com/embed/avatars/0.png'}" alt=""/></div>
+        <div style="flex:1">
+          <div style="font-size:13px;display:flex;align-items:center;gap:8px">${m.username||m.discord_id} <span class="badge ${m.role==='admin'?'b-adm':'b-mem'}">${m.role}</span>${m.banned?'<span class="badge b-ref">Banni</span>':''}</div>
+          <div style="font-size:11px;color:var(--text3)">ID Discord: ${m.discord_id} · Ajouté le ${new Date(m.created_at).toLocaleDateString('fr-FR')}</div>
+        </div>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-o btn-sm" onclick="toggleBan('${m.discord_id}','${m.banned}')">${m.banned?'✅ Débannir':'🚫 Bannir'}</button>
+          <button class="btn btn-o btn-sm" onclick="changeRole('${m.discord_id}','${m.role}')">${m.role==='admin'?'👤 Rétrograder':'⭐ Admin'}</button>
+          <button class="btn btn-x btn-sm" onclick="delMember('${m.discord_id}')">🗑</button>
+        </div>
+      </div>`).join('')}
+  </div>`;
+}
+function openAddMember(){
+  openModal('Ajouter un membre',`
+    <div class="ib">Le membre pourra se connecter avec son Discord une fois ajouté.</div>
+    <div class="fg"><label class="fl">ID Discord</label><input class="fi" id="nm-id" placeholder="Ex: 123456789012345678"/></div>
+    <div class="fg"><label class="fl">Rôle</label>
+      <select class="fi" id="nm-r"><option value="member">Membre</option><option value="admin">Administrateur</option></select>
+    </div>
+    <button class="btn btn-p" style="width:100%" onclick="addMember()">➕ Ajouter</button>
+  `);
+}
+async function addMember(){
+  const id=document.getElementById('nm-id')?.value.trim(),role=document.getElementById('nm-r')?.value;
+  if(!id){toast('Entrez un ID Discord','warn');return;}
+  try{await api('POST','/api/members',{discord_id:id,role});closeModal();toast('Membre ajouté !','ok');await showPage('members');}
+  catch(e){toast('Erreur : membre déjà existant ?','warn');}
+}
+async function toggleBan(id,banned){
+  await api('PATCH',`/api/members/${id}`,{banned:banned==='true'||banned===true?false:true});
+  await showPage('members');
+}
+async function changeRole(id,role){
+  await api('PATCH',`/api/members/${id}`,{role:role==='admin'?'member':'admin'});
+  await showPage('members');
+}
+async function delMember(id){
+  if(!confirm('Supprimer ce membre ?'))return;
+  await api('DELETE',`/api/members/${id}`);
+  toast('Membre supprimé','warn');await showPage('members');
+}
+
+// ── LOGS ───────────────────────────────────────────────
+function pageLogs(){
+  return `<div class="card">
+    <div class="card-title">Logs <span>Système</span> <span style="font-size:11px;color:var(--text3)">(${DATA.logs.length} entrées)</span></div>
+    ${DATA.logs.map(l=>`<div class="log-e">
+      <div class="log-t">${new Date(l.created_at).toLocaleString('fr-FR')}</div>
+      <div style="font-size:16px;flex-shrink:0">${l.icon||'🔹'}</div>
+      <div class="log-txt"><strong>${l.user_name}</strong> — ${l.action}</div>
+    </div>`).join('')||'<div class="empty"><p>Aucun log</p></div>'}
+  </div>`;
+}
+
+// ── SETTINGS ───────────────────────────────────────────
+const WALLPAPERS=[
+  {label:'Aucun',url:''},
+  {label:'Ville',url:'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=1920&q=80'},
+  {label:'Sombre',url:'https://images.unsplash.com/photo-1518770660439-4636190af475?w=1920&q=80'},
+  {label:'Forêt',url:'https://images.unsplash.com/photo-1448375240586-882707db888b?w=1920&q=80'},
+  {label:'Désert',url:'https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=1920&q=80'},
+];
+function pageSettings(){
+  const s=DATA.settings;
+  return `
+  <div class="card">
+    <div class="card-title">Fond d'<span>écran</span></div>
+    <div id="wp-preview" style="width:100%;height:100px;background-size:cover;background-position:center;border:1px solid var(--border);margin-bottom:10px;background-image:url(${s.wallpaper||''});background-color:var(--bg3)"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      ${WALLPAPERS.map(w=>`<div class="wthumb ${(s.wallpaper||'')===w.url?'sel':''}" style="background-image:url(${w.url})" onclick="selWall('${w.url}')" title="${w.label}"></div>`).join('')}
+    </div>
+    <div style="margin-top:16px">
+      <label class="fl">Ou URL personnalisée</label>
+      <input class="fi" id="wp-custom" value="${s.wallpaper||''}" placeholder="https://..."/>
+      <button class="btn btn-o btn-sm" style="margin-top:8px" onclick="selWall(document.getElementById('wp-custom').value)">Aperçu</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Général</div>
+    <div class="fg"><label class="fl">Nom du site</label><input class="fi" id="s-name" value="${s.site_name||'Cartel 13'}"/></div>
+    <div class="fg"><label class="fl">Message d'accueil</label><textarea class="fi" id="s-welcome" rows="2">${s.welcome||''}</textarea></div>
+    <button class="btn btn-p" onclick="saveSettings()">💾 Sauvegarder</button>
+  </div>`;
+}
+function selWall(url){
+  document.getElementById('wp-preview').style.backgroundImage=`url(${url})`;
+  document.getElementById('wp-custom').value=url;
+  document.querySelectorAll('.wthumb').forEach(w=>w.classList.remove('sel'));
+}
+async function saveSettings(){
+  const name=document.getElementById('s-name')?.value;
+  const welcome=document.getElementById('s-welcome')?.value;
+  const wall=document.getElementById('wp-custom')?.value;
+  await Promise.all([
+    api('POST','/api/settings',{key:'site_name',value:name}),
+    api('POST','/api/settings',{key:'welcome',value:welcome}),
+    api('POST','/api/settings',{key:'wallpaper',value:wall}),
+  ]);
+  toast('Paramètres sauvegardés !','ok');
+}
+
+// ── HELPERS ────────────────────────────────────────────
+function bs(s){const m={pending:'b-pend',accepted:'b-acc',delivered:'b-del',refused:'b-ref'};const l={pending:'En attente',accepted:'Acceptée',delivered:'Livrée',refused:'Refusée'};return `<span class="badge ${m[s]||''}">${l[s]||s}</span>`;}
+function toast(msg,type=''){const t=document.createElement('div');t.className='toast '+(type==='ok'?'ok':type==='warn'?'warn':type==='info'?'info':'');t.textContent=msg;document.getElementById('toasts').appendChild(t);setTimeout(()=>t.remove(),3500);}
+function openModal(title,body){document.getElementById('modal-title').textContent=title;document.getElementById('modal-body').innerHTML=body;document.getElementById('modal-ov').classList.add('open');}
+function closeModal(){document.getElementById('modal-ov').classList.remove('open');}
+
+init();
+</script>
+</body>
+</html>
