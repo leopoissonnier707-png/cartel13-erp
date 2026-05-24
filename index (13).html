@@ -1,0 +1,1294 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Cartel 13 — ERP</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a0a;--bg2:#111;--bg3:#161616;--bg4:#1e1e1e;
+  --red:#c0392b;--red2:#e74c3c;--red3:#ff4444;
+  --gold:#c9a84c;--gold2:#f0c040;
+  --text:#e8e8e8;--text2:#aaa;--text3:#666;
+  --border:#2a2a2a;--border2:#333;
+  --success:#27ae60;--warn:#e67e22;--danger:#c0392b;--info:#2980b9;
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+.hidden{display:none!important}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--red);border-radius:2px}
+
+/* NOISE OVERLAY */
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:.4}
+
+/* LOGIN PAGE */
+#login-page{min-height:100vh;display:flex;align-items:center;justify-content:center;position:relative;background:radial-gradient(ellipse at 50% 0%,#1a0505 0%,var(--bg) 60%)}
+#login-page::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 40px,rgba(255,255,255,.01) 40px,rgba(255,255,255,.01) 41px),repeating-linear-gradient(90deg,transparent,transparent 40px,rgba(255,255,255,.01) 40px,rgba(255,255,255,.01) 41px)}
+.login-box{background:var(--bg2);border:1px solid var(--border2);padding:60px 50px;max-width:460px;width:100%;text-align:center;position:relative}
+.login-box::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:60%;height:2px;background:linear-gradient(90deg,transparent,var(--red),transparent)}
+.login-logo{font-family:'Bebas Neue',sans-serif;font-size:72px;letter-spacing:4px;color:var(--text);line-height:1;margin-bottom:4px}
+.login-logo span{color:var(--red)}
+.login-sub{font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:6px;color:var(--text3);text-transform:uppercase;margin-bottom:40px}
+.login-desc{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:36px}
+.btn-discord{display:inline-flex;align-items:center;gap:12px;background:#5865F2;color:#fff;border:none;padding:16px 32px;font-family:'Oswald',sans-serif;font-size:16px;letter-spacing:2px;cursor:pointer;transition:all .2s;width:100%;justify-content:center}
+.btn-discord:hover{background:#4752c4;transform:translateY(-1px)}
+.btn-discord svg{width:22px;height:22px;fill:#fff}
+.login-footer{margin-top:24px;font-size:11px;color:var(--text3)}
+
+/* LAYOUT */
+#app{display:flex;min-height:100vh}
+.sidebar{width:260px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;position:fixed;top:0;left:0;bottom:0;z-index:100;transition:transform .3s}
+.sidebar-logo{padding:28px 24px 20px;border-bottom:1px solid var(--border)}
+.sidebar-logo .logo-main{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:3px;line-height:1}
+.sidebar-logo .logo-main span{color:var(--red)}
+.sidebar-logo .logo-tag{font-size:9px;letter-spacing:5px;color:var(--text3);text-transform:uppercase;margin-top:2px}
+.sidebar-user{padding:16px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.user-avatar{width:38px;height:38px;border-radius:50%;border:2px solid var(--red);overflow:hidden;flex-shrink:0}
+.user-avatar img{width:100%;height:100%;object-fit:cover}
+.user-avatar.placeholder{background:var(--bg4);display:flex;align-items:center;justify-content:center;font-family:'Oswald',sans-serif;font-size:14px;color:var(--red);font-weight:600}
+.user-info .name{font-size:13px;font-weight:500;color:var(--text)}
+.user-info .role{font-size:10px;color:var(--red);letter-spacing:2px;text-transform:uppercase;font-family:'Oswald',sans-serif}
+.sidebar-nav{flex:1;padding:16px 0;overflow-y:auto}
+.nav-section{padding:8px 24px 4px;font-size:9px;letter-spacing:4px;color:var(--text3);text-transform:uppercase;font-family:'Oswald',sans-serif}
+.nav-item{display:flex;align-items:center;gap:12px;padding:11px 24px;color:var(--text2);cursor:pointer;transition:all .15s;font-size:13px;border-left:2px solid transparent;margin:1px 0}
+.nav-item:hover{background:var(--bg3);color:var(--text);border-left-color:var(--border2)}
+.nav-item.active{background:rgba(192,57,43,.1);color:var(--red);border-left-color:var(--red)}
+.nav-item .nav-icon{width:16px;text-align:center;flex-shrink:0}
+.nav-badge{margin-left:auto;background:var(--red);color:#fff;font-size:10px;padding:2px 6px;border-radius:10px;font-weight:600}
+.sidebar-footer{padding:16px 24px;border-top:1px solid var(--border)}
+.btn-logout{display:flex;align-items:center;gap:8px;color:var(--text3);font-size:12px;cursor:pointer;transition:color .15s;background:none;border:none;width:100%;text-align:left}
+.btn-logout:hover{color:var(--red)}
+
+/* MAIN */
+.main-content{flex:1;margin-left:260px;display:flex;flex-direction:column;min-height:100vh}
+.topbar{height:58px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 32px;position:sticky;top:0;z-index:50}
+.topbar-title{font-family:'Oswald',sans-serif;font-size:18px;letter-spacing:2px;font-weight:500}
+.topbar-right{display:flex;align-items:center;gap:16px}
+.topbar-notif{position:relative;cursor:pointer;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border2);border-radius:4px;transition:border-color .15s}
+.topbar-notif:hover{border-color:var(--red)}
+.notif-dot{position:absolute;top:6px;right:6px;width:7px;height:7px;background:var(--red);border-radius:50%;border:2px solid var(--bg2)}
+.page{padding:32px;flex:1}
+
+/* CARDS */
+.card{background:var(--bg2);border:1px solid var(--border);padding:24px;margin-bottom:20px}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.card-title{font-family:'Oswald',sans-serif;font-size:15px;letter-spacing:2px;font-weight:500;text-transform:uppercase}
+.card-title span{color:var(--red)}
+
+/* STATS GRID */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.stat-card{background:var(--bg2);border:1px solid var(--border);padding:20px;position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--accent,var(--red))}
+.stat-val{font-family:'Bebas Neue',sans-serif;font-size:44px;line-height:1;color:var(--text)}
+.stat-label{font-size:10px;letter-spacing:3px;color:var(--text3);text-transform:uppercase;font-family:'Oswald',sans-serif;margin-top:4px}
+.stat-delta{font-size:11px;color:var(--success);margin-top:6px}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border:1px solid;font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:1px;cursor:pointer;transition:all .15s;text-transform:uppercase;border-radius:0}
+.btn-primary{background:var(--red);border-color:var(--red);color:#fff}
+.btn-primary:hover{background:var(--red2);border-color:var(--red2)}
+.btn-outline{background:transparent;border-color:var(--border2);color:var(--text2)}
+.btn-outline:hover{border-color:var(--red);color:var(--red)}
+.btn-success{background:var(--success);border-color:var(--success);color:#fff}
+.btn-success:hover{background:#2ecc71;border-color:#2ecc71}
+.btn-warn{background:var(--warn);border-color:var(--warn);color:#fff}
+.btn-sm{padding:6px 14px;font-size:11px}
+.btn-danger{background:var(--danger);border-color:var(--danger);color:#fff}
+
+/* TABLE */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;padding:10px 14px;font-size:10px;letter-spacing:3px;color:var(--text3);text-transform:uppercase;font-family:'Oswald',sans-serif;border-bottom:1px solid var(--border);font-weight:400}
+td{padding:12px 14px;font-size:13px;border-bottom:1px solid var(--border);color:var(--text2)}
+tr:hover td{background:var(--bg3);color:var(--text)}
+tr:last-child td{border-bottom:none}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;font-size:10px;letter-spacing:1px;text-transform:uppercase;font-family:'Oswald',sans-serif;border-radius:2px}
+.badge-pending{background:rgba(230,126,34,.15);color:var(--warn);border:1px solid rgba(230,126,34,.3)}
+.badge-accepted{background:rgba(39,174,96,.15);color:var(--success);border:1px solid rgba(39,174,96,.3)}
+.badge-delivered{background:rgba(41,128,185,.15);color:#3498db;border:1px solid rgba(41,128,185,.3)}
+.badge-refused{background:rgba(192,57,43,.15);color:var(--red);border:1px solid rgba(192,57,43,.3)}
+.badge-dirty{background:rgba(101,67,33,.3);color:#c0a060;border:1px solid rgba(192,150,60,.3)}
+.badge-clean{background:rgba(39,174,96,.1);color:#a8d8a8;border:1px solid rgba(39,174,96,.2)}
+.badge-admin{background:rgba(192,57,43,.2);color:var(--red2);border:1px solid rgba(192,57,43,.4)}
+.badge-member{background:rgba(41,128,185,.1);color:#5dade2;border:1px solid rgba(41,128,185,.3)}
+
+/* FORM */
+.form-group{margin-bottom:16px}
+.form-label{display:block;font-size:10px;letter-spacing:3px;color:var(--text3);text-transform:uppercase;font-family:'Oswald',sans-serif;margin-bottom:8px}
+.form-input{width:100%;background:var(--bg3);border:1px solid var(--border2);color:var(--text);padding:11px 14px;font-size:13px;font-family:'Inter',sans-serif;outline:none;transition:border-color .15s;border-radius:0}
+.form-input:focus{border-color:var(--red)}
+.form-input::placeholder{color:var(--text3)}
+select.form-input{cursor:pointer}
+select.form-input option{background:var(--bg3)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal{background:var(--bg2);border:1px solid var(--border2);width:100%;max-width:560px;max-height:90vh;overflow-y:auto;position:relative}
+.modal::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--red),transparent)}
+.modal-header{padding:24px 28px 0;display:flex;align-items:center;justify-content:space-between}
+.modal-title{font-family:'Oswald',sans-serif;font-size:17px;letter-spacing:2px;font-weight:500;text-transform:uppercase}
+.modal-close{background:none;border:none;color:var(--text3);cursor:pointer;font-size:20px;padding:4px;transition:color .15s;line-height:1}
+.modal-close:hover{color:var(--red)}
+.modal-body{padding:24px 28px 28px}
+
+/* PRODUCTS GRID */
+.products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
+.product-card{background:var(--bg2);border:1px solid var(--border);overflow:hidden;cursor:pointer;transition:all .2s;position:relative}
+.product-card:hover{border-color:var(--red);transform:translateY(-2px)}
+.product-card:hover .product-order-btn{opacity:1}
+.product-img{height:160px;background:var(--bg3);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.product-img img{width:100%;height:100%;object-fit:cover}
+.product-img .no-img{font-size:48px;opacity:.3}
+.product-cat-tag{position:absolute;top:8px;left:8px;background:rgba(0,0,0,.7);border:1px solid var(--border2);padding:3px 8px;font-size:9px;letter-spacing:2px;text-transform:uppercase;font-family:'Oswald',sans-serif;color:var(--text2)}
+.product-info{padding:16px}
+.product-name{font-family:'Oswald',sans-serif;font-size:16px;font-weight:500;letter-spacing:1px;margin-bottom:6px}
+.product-desc{font-size:12px;color:var(--text3);line-height:1.5;margin-bottom:12px}
+.product-footer{display:flex;align-items:center;justify-content:space-between}
+.product-price{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--gold)}
+.product-price.dirty{color:#c0a060}
+.product-order-btn{opacity:0;transition:opacity .2s}
+
+/* LOGS */
+.log-entry{padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:12px;font-size:12px}
+.log-entry:last-child{border-bottom:none}
+.log-time{color:var(--text3);flex-shrink:0;font-family:'Oswald',sans-serif;letter-spacing:1px;font-size:11px;min-width:140px}
+.log-icon{flex-shrink:0;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;margin-top:1px}
+.log-text{color:var(--text2);line-height:1.5;flex:1}
+.log-text strong{color:var(--text)}
+
+/* TOGGLE */
+.toggle{position:relative;display:inline-block;width:40px;height:22px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;inset:0;background:var(--bg4);border:1px solid var(--border2);cursor:pointer;transition:.3s;border-radius:22px}
+.toggle input:checked+.toggle-slider{background:var(--red);border-color:var(--red)}
+.toggle-slider::before{content:'';position:absolute;height:14px;width:14px;left:3px;bottom:3px;background:#fff;transition:.3s;border-radius:50%}
+.toggle input:checked+.toggle-slider::before{transform:translateX(18px)}
+
+/* COLOR SWATCH */
+.color-swatch{width:28px;height:28px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:border-color .15s}
+.color-swatch.selected{border-color:#fff}
+
+/* TOAST */
+.toast-container{position:fixed;bottom:24px;right:24px;z-index:9000;display:flex;flex-direction:column;gap:10px}
+.toast{background:var(--bg2);border:1px solid var(--border2);padding:14px 18px;font-size:13px;display:flex;align-items:center;gap:10px;min-width:260px;border-left:3px solid var(--red);animation:slideIn .3s ease}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+.toast.success{border-left-color:var(--success)}
+.toast.warn{border-left-color:var(--warn)}
+.toast.info{border-left-color:var(--info)}
+
+/* SEARCH */
+.search-bar{display:flex;align-items:center;gap:0;margin-bottom:20px}
+.search-bar input{flex:1;background:var(--bg3);border:1px solid var(--border2);color:var(--text);padding:10px 14px;font-size:13px;outline:none;border-right:none}
+.search-bar input:focus{border-color:var(--red)}
+.search-bar button{background:var(--bg3);border:1px solid var(--border2);color:var(--text2);padding:10px 14px;cursor:pointer}
+
+/* WALLPAPER */
+#wallpaper-bg{position:fixed;inset:0;z-index:-1;background-size:cover;background-position:center;transition:all .5s}
+
+/* DIVIDER */
+.divider{border:none;border-top:1px solid var(--border);margin:20px 0}
+
+/* INFO BOX */
+.info-box{background:var(--bg3);border:1px solid var(--border2);border-left:3px solid var(--info);padding:14px 18px;font-size:13px;color:var(--text2);margin-bottom:20px;line-height:1.6}
+.info-box.warn{border-left-color:var(--warn)}
+.info-box.success{border-left-color:var(--success)}
+
+/* TABS */
+.tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:24px}
+.tab{padding:12px 20px;font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:1px;cursor:pointer;color:var(--text3);border-bottom:2px solid transparent;transition:all .15s;text-transform:uppercase;margin-bottom:-1px}
+.tab.active{color:var(--red);border-bottom-color:var(--red)}
+.tab:hover:not(.active){color:var(--text);border-bottom-color:var(--border2)}
+
+/* PROGRESS */
+.progress-bar{height:4px;background:var(--bg4);border-radius:2px;overflow:hidden;margin:8px 0}
+.progress-fill{height:100%;background:var(--red);border-radius:2px;transition:width .5s}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:60px 20px;color:var(--text3)}
+.empty-state .empty-icon{font-size:48px;margin-bottom:16px;opacity:.3}
+.empty-state p{font-size:14px}
+
+/* WALLPAPER PREVIEW */
+.wallpaper-preview{width:100%;height:120px;background-size:cover;background-position:center;border:1px solid var(--border);margin-bottom:10px;display:flex;align-items:flex-end;padding:8px}
+.wallpaper-thumb{width:80px;height:50px;background-size:cover;background-position:center;border:2px solid transparent;cursor:pointer;transition:border-color .15s;border-radius:2px}
+.wallpaper-thumb:hover,.wallpaper-thumb.selected{border-color:var(--red)}
+.wallpaper-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+
+/* PRODUCT FORM IMG PREVIEW */
+.img-preview{width:100%;height:140px;background:var(--bg3);border:1px dashed var(--border2);display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:13px;cursor:pointer;transition:border-color .15s;margin-bottom:8px;overflow:hidden;position:relative}
+.img-preview:hover{border-color:var(--red)}
+.img-preview img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+
+/* MEMBERS */
+.member-row{display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid var(--border)}
+.member-row:last-child{border-bottom:none}
+.member-avatar{width:36px;height:36px;border-radius:50%;background:var(--bg4);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--red);font-weight:600;font-family:'Oswald',sans-serif;border:1px solid var(--border2);flex-shrink:0}
+.member-name{flex:1;font-size:13px}
+.member-discord{font-size:11px;color:var(--text3)}
+
+/* INLINE ALERT */
+.alert{padding:12px 16px;border-radius:0;margin-bottom:16px;font-size:13px;border-left:3px solid}
+.alert-success{background:rgba(39,174,96,.1);border-left-color:var(--success);color:#7dcea0}
+.alert-danger{background:rgba(192,57,43,.1);border-left-color:var(--red);color:#f1948a}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .sidebar{transform:translateX(-260px)}
+  .sidebar.open{transform:translateX(0)}
+  .main-content{margin-left:0}
+}
+</style>
+</head>
+<body>
+
+<!-- WALLPAPER BG -->
+<div id="wallpaper-bg"></div>
+
+<!-- TOAST -->
+<div class="toast-container" id="toasts"></div>
+
+<!-- LOGIN -->
+<div id="login-page">
+  <div class="login-box">
+    <div class="login-logo">CARTEL<span>13</span></div>
+    <div class="login-sub">Nova Life — ERP Illégal</div>
+    <p class="login-desc">Plateforme de gestion des activités du Cartel 13.<br/>Connexion réservée aux membres autorisés.</p>
+    <button class="btn-discord" onclick="doLogin()">
+      <svg viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.022.015.043.03.054a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+      Se connecter avec Discord
+    </button>
+    <p class="login-footer">Accès réservé — Cartel 13 © 2024</p>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" class="hidden">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-main">CARTEL<span>13</span></div>
+      <div class="logo-tag">Nova Life ERP</div>
+    </div>
+    <div class="sidebar-user">
+      <div class="user-avatar placeholder" id="sidebar-avatar">?</div>
+      <div class="user-info">
+        <div class="name" id="sidebar-username">—</div>
+        <div class="role" id="sidebar-role">—</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav" id="nav"></nav>
+    <div class="sidebar-footer">
+      <button class="btn-logout" onclick="doLogout()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Déconnexion
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main-content">
+    <div class="topbar">
+      <div class="topbar-title" id="topbar-title">Dashboard</div>
+      <div class="topbar-right">
+        <div class="topbar-notif" onclick="showPage('logs')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span class="notif-dot" id="notif-dot"></span>
+        </div>
+        <div style="font-size:12px;color:var(--text3);font-family:'Oswald',sans-serif;letter-spacing:1px" id="topbar-time"></div>
+      </div>
+    </div>
+    <div class="page" id="page-content"></div>
+  </main>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay hidden" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">—</div>
+      <button class="modal-close" onclick="closeModalDirect()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+// ==================== STATE ====================
+let state = {
+  user: null,
+  page: 'dashboard',
+  pendingOrders: 0,
+
+  members: [
+    {id:'123456789',name:'El_Patron',rp:'El Patron',discordId:'123456789',role:'admin',avatar:'EP',joined:'2024-01-15',banned:false},
+    {id:'987654321',name:'Fantasma',rp:'Fantasma',discordId:'987654321',role:'admin',avatar:'FA',joined:'2024-02-10',banned:false},
+    {id:'111222333',name:'Sombra_Dark',rp:'Sombra',discordId:'111222333',role:'member',avatar:'SD',joined:'2024-03-05',banned:false},
+    {id:'444555666',name:'Lobo_13',rp:'Lobo',discordId:'444555666',role:'member',avatar:'LB',joined:'2024-04-20',banned:false},
+    {id:'777888999',name:'Cobra_Negra',rp:'Cobra',discordId:'777888999',role:'member',avatar:'CN',joined:'2024-05-01',banned:false},
+  ],
+
+  categories: [
+    {id:1,name:'Drogues',icon:'💊',color:'#8e44ad'},
+    {id:2,name:'Armes',icon:'🔫',color:'#c0392b'},
+    {id:3,name:'Munitions',icon:'🔶',color:'#e67e22'},
+    {id:4,name:'Matériel',icon:'🔧',color:'#2980b9'},
+  ],
+
+  products: [
+    {id:1,name:'Cocaïne Pure',catId:1,price:5000,currency:'dirty',desc:'Pureté 98%. Livraison sécurisée.',img:'',available:true},
+    {id:2,name:'Weed Premium',catId:1,price:1200,currency:'dirty',desc:'Cultivé en intérieur, qualité supérieure.',img:'',available:true},
+    {id:3,name:'Glock 17',catId:2,price:8000,currency:'clean',desc:'Semi-auto 9mm, holster inclus.',img:'',available:true},
+    {id:4,name:'AK-47',catId:2,price:22000,currency:'clean',desc:'Kalashnikov 7.62mm. Dégâts élevés.',img:'',available:false},
+    {id:5,name:'Chargeur Glock x3',catId:3,price:600,currency:'dirty',desc:'3 chargeurs 17 coups.',img:'',available:true},
+    {id:6,name:'Gilet Kevlar',catId:4,price:4500,currency:'clean',desc:'Protection balistique niveau 3.',img:'',available:true},
+  ],
+
+  orders: [
+    {id:'CMD-001',userId:'111222333',userName:'Sombra_Dark',rpName:'Sombra',rpGroup:'Cartel 13',phone:'06 13 45 67 89',productId:1,productName:'Cocaïne Pure',qty:2,total:10000,currency:'dirty',status:'pending',assignedTo:null,date:'2024-06-01 14:23',note:''},
+    {id:'CMD-002',userId:'444555666',userName:'Lobo_13',rpName:'Lobo',rpGroup:'Cartel 13',phone:'07 89 23 45 61',productId:3,productName:'Glock 17',qty:1,total:8000,currency:'clean',status:'accepted',assignedTo:'El_Patron',date:'2024-06-01 15:10',note:''},
+    {id:'CMD-003',userId:'777888999',userName:'Cobra_Negra',rpName:'Cobra',rpGroup:'Cartel 13',phone:'06 77 34 12 56',productId:5,productName:'Chargeur Glock x3',qty:4,total:2400,currency:'dirty',status:'delivered',assignedTo:'Fantasma',date:'2024-05-31 09:45',note:''},
+    {id:'CMD-004',userId:'111222333',userName:'Sombra_Dark',rpName:'Sombra',rpGroup:'Cartel 13',phone:'06 13 45 67 89',productId:6,productName:'Gilet Kevlar',qty:1,total:4500,currency:'clean',status:'pending',assignedTo:null,date:'2024-06-02 11:00',note:''},
+  ],
+
+  logs: [
+    {id:1,time:'2024-06-02 11:00',user:'Cobra_Negra',action:'Nouvelle commande CMD-004 — Gilet Kevlar x1',type:'order',icon:'🛒'},
+    {id:2,time:'2024-06-01 15:30',user:'El_Patron',action:'Commande CMD-002 acceptée et assignée à El_Patron',type:'accept',icon:'✅'},
+    {id:3,time:'2024-06-01 14:23',user:'Sombra_Dark',action:'Nouvelle commande CMD-001 — Cocaïne Pure x2',type:'order',icon:'🛒'},
+    {id:4,time:'2024-05-31 18:00',user:'Fantasma',action:'Commande CMD-003 marquée livrée',type:'deliver',icon:'📦'},
+    {id:5,time:'2024-05-30 12:00',user:'El_Patron',action:'Produit AK-47 désactivé',type:'admin',icon:'⚙️'},
+    {id:6,time:'2024-05-29 09:15',user:'El_Patron',action:'Nouveau membre ajouté : Cobra_Negra',type:'member',icon:'👤'},
+    {id:7,time:'2024-05-28 16:40',user:'Fantasma',action:'Message bot envoyé à Lobo_13',type:'bot',icon:'🤖'},
+    {id:8,time:'2024-05-27 14:00',user:'El_Patron',action:'Fond d\'écran modifié',type:'admin',icon:'🎨'},
+  ],
+
+  settings: {
+    wallpaper:'',
+    wallpaperOpacity:0.15,
+    accentColor:'#c0392b',
+    siteName:'Cartel 13',
+    welcomeText:'Bienvenue sur l\'ERP du Cartel 13',
+    discordWebhook:'',
+    discordBotToken:'',
+    discordServerId:'',
+  },
+
+  nextOrderId: 5,
+  nextProductId: 7,
+  nextCatId: 5,
+};
+
+const WALLPAPERS = [
+  {id:'none',label:'Aucun',url:''},
+  {id:'city',label:'Ville',url:'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=1920&q=80'},
+  {id:'dark',label:'Sombre',url:'https://images.unsplash.com/photo-1518770660439-4636190af475?w=1920&q=80'},
+  {id:'forest',label:'Forêt',url:'https://images.unsplash.com/photo-1448375240586-882707db888b?w=1920&q=80'},
+  {id:'desert',label:'Désert',url:'https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=1920&q=80'},
+];
+const ACCENT_COLORS = ['#c0392b','#8e44ad','#2980b9','#27ae60','#e67e22','#1a1a1a','#c9a84c','#e84393'];
+
+// ==================== UTILS ====================
+function toast(msg,type='default'){
+  const t=document.createElement('div');
+  t.className='toast '+(type==='success'?'success':type==='warn'?'warn':type==='info'?'info':'');
+  t.innerHTML=`<span>${msg}</span>`;
+  document.getElementById('toasts').appendChild(t);
+  setTimeout(()=>t.remove(),3500);
+}
+function addLog(user,action,type='action',icon='🔹'){
+  const now=new Date();
+  const time=now.toLocaleString('fr-FR',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}).replace(',','');
+  state.logs.unshift({id:Date.now(),time,user,action,type,icon});
+}
+function updateNotifDot(){
+  const p=state.orders.filter(o=>o.status==='pending').length;
+  state.pendingOrders=p;
+  const dot=document.getElementById('notif-dot');
+  if(dot) dot.style.display=p>0?'block':'none';
+}
+function updateTime(){
+  const el=document.getElementById('topbar-time');
+  if(el) el.textContent=new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+function applyWallpaper(){
+  const bg=document.getElementById('wallpaper-bg');
+  if(state.settings.wallpaper){
+    bg.style.backgroundImage=`url(${state.settings.wallpaper})`;
+    bg.style.opacity=state.settings.wallpaperOpacity;
+  } else {
+    bg.style.backgroundImage='none';
+    bg.style.opacity=0;
+  }
+  document.documentElement.style.setProperty('--red',state.settings.accentColor);
+  document.documentElement.style.setProperty('--red2',lightenColor(state.settings.accentColor,20));
+}
+function lightenColor(hex,pct){
+  const n=parseInt(hex.slice(1),16);
+  const r=Math.min(255,((n>>16)&255)+pct);
+  const g=Math.min(255,((n>>8)&255)+pct);
+  const b=Math.min(255,(n&255)+pct);
+  return `#${[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('')}`;
+}
+function isAdmin(){return state.user&&state.user.role==='admin';}
+
+// ==================== AUTH ====================
+function doLogin(){
+  // Simulate Discord OAuth — in real app redirect to Discord
+  const mockUser=state.members[0]; // El_Patron (admin)
+  loginAs(mockUser);
+}
+function loginAs(member){
+  state.user=member;
+  document.getElementById('login-page').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  document.getElementById('sidebar-username').textContent=member.name;
+  document.getElementById('sidebar-role').textContent=member.role==='admin'?'Administrateur':'Membre';
+  const av=document.getElementById('sidebar-avatar');
+  av.textContent=member.avatar;
+  av.style.borderColor=member.role==='admin'?'var(--gold)':'var(--red)';
+  buildNav();
+  showPage('dashboard');
+  applyWallpaper();
+  updateNotifDot();
+  setInterval(updateTime,1000);
+  updateTime();
+}
+function doLogout(){
+  state.user=null;
+  document.getElementById('app').classList.add('hidden');
+  document.getElementById('login-page').classList.remove('hidden');
+}
+
+// ==================== NAV ====================
+function buildNav(){
+  const nav=document.getElementById('nav');
+  const pending=state.orders.filter(o=>o.status==='pending').length;
+  let html='';
+  // Client
+  html+=`<div class="nav-section">Boutique</div>`;
+  html+=navItem('catalog','📦','Catalogue','catalog');
+  html+=navItem('order','🛒','Mes Commandes','myorders');
+  // Admin
+  if(isAdmin()){
+    html+=`<div class="nav-section" style="margin-top:12px">Administration</div>`;
+    html+=navItem('dashboard','📊','Dashboard','dashboard');
+    html+=navItem('orders','📋','Commandes',`orders`,pending>0?pending:'');
+    html+=navItem('products','🏪','Produits','products');
+    html+=navItem('members','👥','Membres','members');
+    html+=navItem('bot','🤖','Bot Discord','bot');
+    html+=navItem('logs','📜','Logs système','logs');
+    html+=navItem('settings','⚙️','Paramètres','settings');
+  }
+  nav.innerHTML=html;
+}
+function navItem(id,icon,label,page,badge=''){
+  return `<div class="nav-item" id="nav-${id}" onclick="showPage('${page}')"><span class="nav-icon">${icon}</span>${label}${badge?`<span class="nav-badge">${badge}</span>`:''}</div>`;
+}
+function setActiveNav(page){
+  document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
+  const map={dashboard:'dashboard',orders:'orders',catalog:'catalog',myorders:'order',products:'products',members:'members',bot:'bot',logs:'logs',settings:'settings'};
+  const id=Object.entries(map).find(([k,v])=>v===page);
+  if(id) {
+    const el=document.getElementById(`nav-${id[0]}`);
+    if(el) el.classList.add('active');
+  }
+}
+
+// ==================== PAGES ====================
+function showPage(page){
+  state.page=page;
+  setActiveNav(page);
+  const titles={dashboard:'Dashboard',orders:'Commandes',catalog:'Catalogue',myorders:'Mes Commandes',products:'Produits & Catégories',members:'Membres',bot:'Bot Discord',logs:'Logs Système',settings:'Paramètres'};
+  document.getElementById('topbar-title').textContent=titles[page]||page;
+  const content=document.getElementById('page-content');
+  switch(page){
+    case 'dashboard': content.innerHTML=pageDashboard(); break;
+    case 'orders': content.innerHTML=pageOrders(); break;
+    case 'catalog': content.innerHTML=pageCatalog(); break;
+    case 'myorders': content.innerHTML=pageMyOrders(); break;
+    case 'products': content.innerHTML=pageProducts(); break;
+    case 'members': content.innerHTML=pageMembers(); break;
+    case 'bot': content.innerHTML=pageBot(); break;
+    case 'logs': content.innerHTML=pageLogs(); break;
+    case 'settings': content.innerHTML=pageSettings(); break;
+    default: content.innerHTML='<p>Page introuvable</p>';
+  }
+}
+
+// ==================== DASHBOARD ====================
+function pageDashboard(){
+  const orders=state.orders;
+  const total=orders.reduce((s,o)=>s+o.total,0);
+  const pending=orders.filter(o=>o.status==='pending').length;
+  const delivered=orders.filter(o=>o.status==='delivered').length;
+  const members=state.members.filter(m=>!m.banned).length;
+  return `
+  <div class="stats-grid">
+    <div class="stat-card" style="--accent:var(--red)">
+      <div class="stat-val">${orders.length}</div>
+      <div class="stat-label">Total Commandes</div>
+      <div class="stat-delta">↑ actives</div>
+    </div>
+    <div class="stat-card" style="--accent:var(--warn)">
+      <div class="stat-val">${pending}</div>
+      <div class="stat-label">En attente</div>
+    </div>
+    <div class="stat-card" style="--accent:var(--success)">
+      <div class="stat-val">${delivered}</div>
+      <div class="stat-label">Livrées</div>
+    </div>
+    <div class="stat-card" style="--accent:#2980b9">
+      <div class="stat-val">${members}</div>
+      <div class="stat-label">Membres actifs</div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Dernières <span>commandes</span></div>
+        <button class="btn btn-outline btn-sm" onclick="showPage('orders')">Voir tout</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>ID</th><th>Client</th><th>Produit</th><th>Statut</th></tr></thead>
+          <tbody>${state.orders.slice(0,4).map(o=>`
+            <tr>
+              <td style="font-family:'Oswald',sans-serif;color:var(--red)">${o.id}</td>
+              <td>${o.userName}</td>
+              <td>${o.productName}</td>
+              <td>${badgeStatus(o.status)}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Derniers <span>logs</span></div>
+        <button class="btn btn-outline btn-sm" onclick="showPage('logs')">Voir tout</button>
+      </div>
+      ${state.logs.slice(0,5).map(l=>`
+        <div class="log-entry">
+          <div class="log-time">${l.time.split(' ')[1]||''}</div>
+          <div class="log-icon" style="background:var(--bg3)">${l.icon}</div>
+          <div class="log-text"><strong>${l.user}</strong> — ${l.action}</div>
+        </div>`).join('')}
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:20px">
+    <div class="card-header"><div class="card-title">Revenus par <span>catégorie</span></div></div>
+    ${state.categories.map(cat=>{
+      const total=state.orders.filter(o=>{
+        const p=state.products.find(pp=>pp.id===o.productId);
+        return p&&p.catId===cat.id;
+      }).reduce((s,o)=>s+o.total,0);
+      const max=50000;
+      return `<div style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+          <span>${cat.icon} ${cat.name}</span>
+          <span style="font-family:'Oswald',sans-serif;color:var(--gold)">${total.toLocaleString('fr-FR')} $</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${Math.min(100,total/max*100)}%;background:${cat.color}"></div></div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+// ==================== CATALOG ====================
+function pageCatalog(){
+  const cats=[{id:0,name:'Tous',icon:'🏪'},...state.categories];
+  return `
+  <div class="info-box">Sélectionnez un produit pour passer commande. Vos informations RP seront demandées à la confirmation.</div>
+  <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap">
+    ${cats.map(c=>`<button class="btn btn-outline btn-sm" onclick="filterCatalog(${c.id})" id="cat-filter-${c.id}">${c.icon} ${c.name}</button>`).join('')}
+  </div>
+  <div class="products-grid" id="products-grid">
+    ${renderProducts(0)}
+  </div>`;
+}
+function renderProducts(catId){
+  const prods=catId===0?state.products.filter(p=>p.available):state.products.filter(p=>p.catId===catId&&p.available);
+  if(!prods.length) return `<div class="empty-state"><div class="empty-icon">📦</div><p>Aucun produit disponible</p></div>`;
+  return prods.map(p=>{
+    const cat=state.categories.find(c=>c.id===p.catId);
+    return `<div class="product-card">
+      <div class="product-img">
+        ${p.img?`<img src="${p.img}" alt="${p.name}"/>`:`<span class="no-img">${cat?cat.icon:'📦'}</span>`}
+        <span class="product-cat-tag">${cat?cat.name:'—'}</span>
+      </div>
+      <div class="product-info">
+        <div class="product-name">${p.name}</div>
+        <div class="product-desc">${p.desc||'Aucune description.'}</div>
+        <div class="product-footer">
+          <div class="product-price ${p.currency==='dirty'?'dirty':''}">${p.price.toLocaleString('fr-FR')} $<span style="font-size:12px;margin-left:4px">${p.currency==='dirty'?'💰sale':'💵propre'}</span></div>
+          <button class="btn btn-primary btn-sm product-order-btn" onclick="openOrderModal(${p.id})">Commander</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function filterCatalog(catId){
+  document.getElementById('products-grid').innerHTML=renderProducts(catId);
+}
+function openOrderModal(productId){
+  const p=state.products.find(pp=>pp.id===productId);
+  if(!p) return;
+  openModal('Nouvelle Commande — '+p.name,`
+    <div class="info-box">Remplissez vos informations RP pour cette commande.</div>
+    <div class="form-group">
+      <label class="form-label">Prénom RP</label>
+      <input class="form-input" id="ord-rp" placeholder="Votre prénom en RP" value="${state.user?.rp||''}"/>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Numéro de téléphone RP</label>
+        <input class="form-input" id="ord-phone" placeholder="Ex: 06 12 34 56 78"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Quantité</label>
+        <input class="form-input" type="number" id="ord-qty" value="1" min="1" oninput="updateOrderTotal(${p.price})"/>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Groupe illégal / Organisation RP</label>
+      <input class="form-input" id="ord-group" placeholder="Ex: Cartel 13, Yakuza..."/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Note (optionnel)</label>
+      <textarea class="form-input" id="ord-note" rows="2" placeholder="Informations supplémentaires..."></textarea>
+    </div>
+    <div style="background:var(--bg3);border:1px solid var(--border2);padding:14px;margin-bottom:20px">
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">
+        <span style="color:var(--text2)">Produit</span><span>${p.name}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">
+        <span style="color:var(--text2)">Prix unitaire</span><span>${p.price.toLocaleString('fr-FR')} $ ${p.currency==='dirty'?'(sale)':'(propre)'}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:15px;margin-top:8px;border-top:1px solid var(--border);padding-top:8px">
+        <span style="font-family:'Oswald',sans-serif">TOTAL</span>
+        <span id="ord-total" style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--gold)">${p.price.toLocaleString('fr-FR')} $</span>
+      </div>
+    </div>
+    <button class="btn btn-primary" style="width:100%" onclick="submitOrder(${productId})">✅ Confirmer la commande</button>
+  `);
+}
+function updateOrderTotal(unitPrice){
+  const qty=parseInt(document.getElementById('ord-qty')?.value)||1;
+  const el=document.getElementById('ord-total');
+  if(el) el.textContent=(unitPrice*qty).toLocaleString('fr-FR')+' $';
+}
+function submitOrder(productId){
+  const p=state.products.find(pp=>pp.id===productId);
+  const rp=document.getElementById('ord-rp')?.value.trim();
+  const phone=document.getElementById('ord-phone')?.value.trim();
+  const qty=parseInt(document.getElementById('ord-qty')?.value)||1;
+  const group=document.getElementById('ord-group')?.value.trim();
+  const note=document.getElementById('ord-note')?.value.trim();
+  if(!rp||!phone||!group){toast('Remplissez tous les champs obligatoires','warn');return;}
+  const id='CMD-'+String(state.nextOrderId++).padStart(3,'0');
+  const order={
+    id,userId:state.user.id,userName:state.user.name,
+    rpName:rp,rpGroup:group,phone,
+    productId,productName:p.name,qty,
+    total:p.price*qty,currency:p.currency,
+    status:'pending',assignedTo:null,
+    date:new Date().toLocaleString('fr-FR').replace(',',''),note
+  };
+  state.orders.unshift(order);
+  addLog(state.user.name,`Nouvelle commande ${id} — ${p.name} x${qty}`,'order','🛒');
+  updateNotifDot();
+  buildNav();
+  closeModalDirect();
+  showSuccessOrderModal(order,p);
+}
+function showSuccessOrderModal(order,p){
+  openModal('✅ Commande Envoyée',`
+    <div class="alert alert-success">Votre commande a bien été reçue ! Un message vous a été envoyé en MP Discord.</div>
+    <div style="background:var(--bg3);border:1px solid var(--border2);padding:20px;text-align:center">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--red);margin-bottom:4px">${order.id}</div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:16px">Votre numéro de commande</div>
+      <div style="font-size:14px;margin-bottom:6px">${p.name} × ${order.qty}</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--gold)">${order.total.toLocaleString('fr-FR')} $</div>
+    </div>
+    <div class="info-box" style="margin-top:16px">📱 Un membre du Cartel vous contactera sur votre téléphone RP <strong>${order.phone}</strong> pour confirmer la livraison.</div>
+    <button class="btn btn-outline" style="width:100%;margin-top:12px" onclick="closeModalDirect()">Fermer</button>
+  `);
+}
+
+// ==================== MY ORDERS ====================
+function pageMyOrders(){
+  const orders=state.orders.filter(o=>o.userId===state.user.id);
+  if(!orders.length) return `<div class="empty-state"><div class="empty-icon">🛒</div><p>Vous n'avez pas encore passé de commande.</p><br/><button class="btn btn-primary" onclick="showPage('catalog')">Voir le catalogue</button></div>`;
+  return `<div class="card">
+    <div class="card-header"><div class="card-title">Mes <span>Commandes</span></div></div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>ID</th><th>Produit</th><th>Qté</th><th>Total</th><th>Statut</th><th>Date</th></tr></thead>
+      <tbody>${orders.map(o=>`
+        <tr>
+          <td style="font-family:'Oswald',sans-serif;color:var(--red)">${o.id}</td>
+          <td>${o.productName}</td>
+          <td>${o.qty}</td>
+          <td style="font-family:'Oswald',sans-serif;color:var(--gold)">${o.total.toLocaleString('fr-FR')} $</td>
+          <td>${badgeStatus(o.status)}</td>
+          <td style="font-size:11px;color:var(--text3)">${o.date}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table></div>
+  </div>`;
+}
+
+// ==================== ORDERS ADMIN ====================
+function pageOrders(){
+  const statusFilter=['all','pending','accepted','delivered','refused'];
+  return `
+  <div class="tabs" id="order-tabs">
+    ${statusFilter.map((s,i)=>`<div class="tab${i===0?' active':''}" onclick="filterOrders('${s}',this)">${s==='all'?'Toutes':s==='pending'?'En attente':s==='accepted'?'Acceptées':s==='delivered'?'Livrées':'Refusées'} <span style="opacity:.5;font-size:11px">(${s==='all'?state.orders.length:state.orders.filter(o=>o.status===s).length})</span></div>`).join('')}
+  </div>
+  <div id="orders-table">${renderOrdersTable('all')}</div>`;
+}
+function filterOrders(status,el){
+  document.querySelectorAll('#order-tabs .tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('orders-table').innerHTML=renderOrdersTable(status);
+}
+function renderOrdersTable(status){
+  const orders=status==='all'?state.orders:state.orders.filter(o=>o.status===status);
+  if(!orders.length) return `<div class="empty-state"><div class="empty-icon">📋</div><p>Aucune commande.</p></div>`;
+  return `<div class="card"><div class="table-wrap"><table>
+    <thead><tr><th>ID</th><th>Client RP</th><th>Groupe</th><th>Produit</th><th>Total</th><th>Statut</th><th>Assigné</th><th>Actions</th></tr></thead>
+    <tbody>${orders.map(o=>`
+      <tr>
+        <td style="font-family:'Oswald',sans-serif;color:var(--red);cursor:pointer" onclick="viewOrder('${o.id}')">${o.id}</td>
+        <td><div>${o.rpName}</div><div style="font-size:11px;color:var(--text3)">${o.userName} · 📞 ${o.phone}</div></td>
+        <td>${o.rpGroup}</td>
+        <td>${o.productName} ×${o.qty}</td>
+        <td style="font-family:'Oswald',sans-serif;color:var(--gold)">${o.total.toLocaleString('fr-FR')} $<br/><span style="font-size:10px">${badgeCurrency(o.currency)}</span></td>
+        <td>${badgeStatus(o.status)}</td>
+        <td style="font-size:12px;color:var(--text3)">${o.assignedTo||'—'}</td>
+        <td>
+          ${o.status==='pending'?`<button class="btn btn-success btn-sm" onclick="acceptOrder('${o.id}')">✅ Accepter</button> <button class="btn btn-danger btn-sm" onclick="refuseOrder('${o.id}')">✕</button>`:''}
+          ${o.status==='accepted'?`<button class="btn btn-outline btn-sm" onclick="deliverOrder('${o.id}')">📦 Livré</button>`:''}
+          <button class="btn btn-outline btn-sm" onclick="viewOrder('${o.id}')" style="margin-left:4px">👁</button>
+        </td>
+      </tr>`).join('')}
+    </tbody>
+  </table></div></div>`;
+}
+function acceptOrder(id){
+  const o=state.orders.find(o=>o.id===id);
+  if(!o) return;
+  o.status='accepted';
+  o.assignedTo=state.user.name;
+  addLog(state.user.name,`Commande ${id} acceptée et assignée à ${state.user.name}`,'accept','✅');
+  toast(`Commande ${id} acceptée — notification Discord envoyée au client`,'success');
+  updateNotifDot();
+  buildNav();
+  showPage('orders');
+}
+function refuseOrder(id){
+  const o=state.orders.find(o=>o.id===id);
+  if(!o) return;
+  o.status='refused';
+  addLog(state.user.name,`Commande ${id} refusée`,'refuse','❌');
+  toast(`Commande ${id} refusée`,'warn');
+  updateNotifDot();
+  buildNav();
+  showPage('orders');
+}
+function deliverOrder(id){
+  const o=state.orders.find(o=>o.id===id);
+  if(!o) return;
+  o.status='delivered';
+  addLog(state.user.name,`Commande ${id} marquée comme livrée`,'deliver','📦');
+  toast(`Commande ${id} livrée !`,'success');
+  showPage('orders');
+}
+function viewOrder(id){
+  const o=state.orders.find(o=>o.id===id);
+  if(!o) return;
+  openModal(`Commande ${o.id}`,`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+      <div style="background:var(--bg3);border:1px solid var(--border);padding:16px">
+        <div style="font-size:10px;letter-spacing:3px;color:var(--text3);font-family:'Oswald',sans-serif;margin-bottom:12px">CLIENT RP</div>
+        <div style="font-size:16px;font-family:'Oswald',sans-serif;margin-bottom:4px">${o.rpName}</div>
+        <div style="font-size:12px;color:var(--text3)">${o.userName}</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px">📞 ${o.phone}</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px">👥 ${o.rpGroup}</div>
+      </div>
+      <div style="background:var(--bg3);border:1px solid var(--border);padding:16px">
+        <div style="font-size:10px;letter-spacing:3px;color:var(--text3);font-family:'Oswald',sans-serif;margin-bottom:12px">COMMANDE</div>
+        <div style="font-size:16px;font-family:'Oswald',sans-serif;margin-bottom:4px">${o.productName}</div>
+        <div style="font-size:12px;color:var(--text3)">Quantité : ${o.qty}</div>
+        <div style="font-size:20px;font-family:'Bebas Neue',sans-serif;color:var(--gold);margin-top:8px">${o.total.toLocaleString('fr-FR')} $</div>
+        <div>${badgeCurrency(o.currency)}</div>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div>Statut : ${badgeStatus(o.status)}</div>
+      <div style="font-size:12px;color:var(--text3)">${o.date}</div>
+    </div>
+    ${o.note?`<div class="info-box">📝 Note : ${o.note}</div>`:''}
+    ${o.assignedTo?`<div class="info-box success">✅ Assigné à : <strong>${o.assignedTo}</strong></div>`:''}
+    <div style="display:flex;gap:10px;margin-top:16px">
+      ${o.status==='pending'?`<button class="btn btn-success" onclick="acceptOrder('${o.id}');closeModalDirect()">✅ Accepter</button><button class="btn btn-danger" onclick="refuseOrder('${o.id}');closeModalDirect()">✕ Refuser</button>`:''}
+      ${o.status==='accepted'?`<button class="btn btn-outline" onclick="deliverOrder('${o.id}');closeModalDirect()">📦 Marquer livré</button>`:''}
+    </div>
+  `);
+}
+
+// ==================== PRODUCTS ADMIN ====================
+function pageProducts(){
+  return `
+  <div style="display:flex;gap:12px;margin-bottom:20px">
+    <button class="btn btn-primary" onclick="openAddProduct()">+ Ajouter un produit</button>
+    <button class="btn btn-outline" onclick="openManageCategories()">⚙️ Gérer les catégories</button>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="card-title">Produits <span>(${state.products.length})</span></div></div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Produit</th><th>Catégorie</th><th>Prix</th><th>Devise</th><th>Statut</th><th>Actions</th></tr></thead>
+      <tbody>${state.products.map(p=>{
+        const cat=state.categories.find(c=>c.id===p.catId);
+        return `<tr>
+          <td><strong>${p.name}</strong><div style="font-size:11px;color:var(--text3)">${p.desc?.substring(0,40)||''}...</div></td>
+          <td>${cat?`${cat.icon} ${cat.name}`:'—'}</td>
+          <td style="font-family:'Oswald',sans-serif;color:var(--gold)">${p.price.toLocaleString('fr-FR')} $</td>
+          <td>${badgeCurrency(p.currency)}</td>
+          <td>${p.available?'<span class="badge badge-accepted">✓ Dispo</span>':'<span class="badge badge-refused">✕ Indispo</span>'}</td>
+          <td>
+            <button class="btn btn-outline btn-sm" onclick="openEditProduct(${p.id})">✏️</button>
+            <button class="btn btn-outline btn-sm" onclick="toggleProduct(${p.id})">${p.available?'🚫':'✅'}</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteProduct(${p.id})">🗑</button>
+          </td>
+        </tr>`;}).join('')}
+      </tbody>
+    </table></div>
+  </div>`;
+}
+function openAddProduct(){
+  openModal('Ajouter un produit',productForm(null));
+}
+function openEditProduct(id){
+  const p=state.products.find(pp=>pp.id===id);
+  openModal('Modifier le produit',productForm(p));
+}
+function productForm(p){
+  const cats=state.categories.map(c=>`<option value="${c.id}" ${p&&p.catId===c.id?'selected':''}>${c.icon} ${c.name}</option>`).join('');
+  return `
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Nom du produit</label><input class="form-input" id="pf-name" value="${p?p.name:''}"/></div>
+      <div class="form-group"><label class="form-label">Catégorie</label><select class="form-input" id="pf-cat"><option value="">— Catégorie —</option>${cats}</select></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Prix ($)</label><input class="form-input" type="number" id="pf-price" value="${p?p.price:0}"/></div>
+      <div class="form-group"><label class="form-label">Devise</label>
+        <select class="form-input" id="pf-currency">
+          <option value="dirty" ${p&&p.currency==='dirty'?'selected':''}>💰 Argent sale</option>
+          <option value="clean" ${p&&p.currency==='clean'?'selected':''}>💵 Argent propre</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group"><label class="form-label">Description</label><textarea class="form-input" id="pf-desc" rows="2">${p?p.desc:''}</textarea></div>
+    <div class="form-group">
+      <label class="form-label">URL de l'image</label>
+      <input class="form-input" id="pf-img" placeholder="https://..." value="${p?p.img:''}" oninput="previewImg(this.value)"/>
+      <div class="img-preview" id="pf-preview">${p&&p.img?`<img src="${p.img}"/>`:'📷 Aperçu image'}</div>
+    </div>
+    <button class="btn btn-primary" style="width:100%" onclick="saveProduct(${p?p.id:'null'})">${p?'💾 Enregistrer':'➕ Créer le produit'}</button>
+  `;
+}
+function previewImg(url){
+  const el=document.getElementById('pf-preview');
+  if(!el) return;
+  el.innerHTML=url?`<img src="${url}" onerror="this.parentElement.innerHTML='❌ Image invalide'"/>`:'📷 Aperçu image';
+}
+function saveProduct(id){
+  const name=document.getElementById('pf-name')?.value.trim();
+  const catId=parseInt(document.getElementById('pf-cat')?.value);
+  const price=parseInt(document.getElementById('pf-price')?.value)||0;
+  const currency=document.getElementById('pf-currency')?.value;
+  const desc=document.getElementById('pf-desc')?.value.trim();
+  const img=document.getElementById('pf-img')?.value.trim();
+  if(!name||!catId) {toast('Remplissez le nom et la catégorie','warn');return;}
+  if(id===null||id==='null'){
+    state.products.push({id:state.nextProductId++,name,catId,price,currency,desc,img,available:true});
+    addLog(state.user.name,`Produit ajouté : ${name}`,'admin','🏪');
+    toast('Produit ajouté !','success');
+  } else {
+    const p=state.products.find(pp=>pp.id===id);
+    if(p){Object.assign(p,{name,catId,price,currency,desc,img});addLog(state.user.name,`Produit modifié : ${name}`,'admin','✏️');toast('Produit mis à jour !','success');}
+  }
+  closeModalDirect();showPage('products');
+}
+function toggleProduct(id){
+  const p=state.products.find(pp=>pp.id===id);
+  if(!p) return;
+  p.available=!p.available;
+  addLog(state.user.name,`Produit ${p.name} ${p.available?'activé':'désactivé'}`,'admin','⚙️');
+  toast(`Produit ${p.available?'activé':'désactivé'}`,'info');
+  showPage('products');
+}
+function deleteProduct(id){
+  const p=state.products.find(pp=>pp.id===id);
+  if(!p) return;
+  if(!confirm(`Supprimer "${p.name}" ?`)) return;
+  state.products=state.products.filter(pp=>pp.id!==id);
+  addLog(state.user.name,`Produit supprimé : ${p.name}`,'admin','🗑');
+  toast('Produit supprimé','warn');
+  showPage('products');
+}
+function openManageCategories(){
+  openModal('Gérer les catégories',`
+    <div id="cats-list">${renderCatList()}</div>
+    <hr class="divider"/>
+    <div style="font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:1px;margin-bottom:12px">NOUVELLE CATÉGORIE</div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Nom</label><input class="form-input" id="new-cat-name" placeholder="Ex: Explosifs"/></div>
+      <div class="form-group"><label class="form-label">Icône (emoji)</label><input class="form-input" id="new-cat-icon" placeholder="💣" maxlength="2"/></div>
+    </div>
+    <button class="btn btn-primary" onclick="addCategory()">+ Ajouter</button>
+  `);
+}
+function renderCatList(){
+  return state.categories.map(c=>`
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)">
+      <span style="font-size:20px">${c.icon}</span>
+      <span style="flex:1;font-size:13px">${c.name}</span>
+      <button class="btn btn-danger btn-sm" onclick="deleteCat(${c.id})">🗑</button>
+    </div>`).join('');
+}
+function addCategory(){
+  const name=document.getElementById('new-cat-name')?.value.trim();
+  const icon=document.getElementById('new-cat-icon')?.value.trim()||'📁';
+  if(!name){toast('Entrez un nom','warn');return;}
+  state.categories.push({id:state.nextCatId++,name,icon,color:'#888'});
+  addLog(state.user.name,`Catégorie ajoutée : ${icon} ${name}`,'admin','📁');
+  document.getElementById('cats-list').innerHTML=renderCatList();
+  document.getElementById('new-cat-name').value='';
+  document.getElementById('new-cat-icon').value='';
+  toast('Catégorie ajoutée','success');
+}
+function deleteCat(id){
+  state.categories=state.categories.filter(c=>c.id!==id);
+  document.getElementById('cats-list').innerHTML=renderCatList();
+  toast('Catégorie supprimée','warn');
+}
+
+// ==================== MEMBERS ====================
+function pageMembers(){
+  return `
+  <div style="display:flex;gap:12px;margin-bottom:20px">
+    <button class="btn btn-primary" onclick="openAddMember()">+ Ajouter un membre</button>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="card-title">Membres <span>(${state.members.length})</span></div></div>
+    ${state.members.map(m=>`
+      <div class="member-row">
+        <div class="member-avatar" style="${m.banned?'opacity:.4':''}">${m.avatar}</div>
+        <div style="flex:1">
+          <div class="member-name" style="${m.banned?'text-decoration:line-through;color:var(--text3)':''}">
+            ${m.name} ${badgeRole(m.role)} ${m.banned?'<span class="badge badge-refused">BANNI</span>':''}
+          </div>
+          <div class="member-discord">Discord ID: ${m.discordId} · Prénom RP: ${m.rp} · Depuis ${m.joined}</div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-outline btn-sm" onclick="toggleBan('${m.id}')">${m.banned?'✅ Débannir':'🚫 Bannir'}</button>
+          <button class="btn btn-outline btn-sm" onclick="changeRole('${m.id}')">${m.role==='admin'?'👤 Retirer admin':'⭐ Passer admin'}</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteMember('${m.id}')">🗑</button>
+        </div>
+      </div>`).join('')}
+  </div>`;
+}
+function openAddMember(){
+  openModal('Ajouter un membre',`
+    <div class="info-box">Le membre doit être sur votre serveur Discord pour accéder au panel.</div>
+    <div class="form-group"><label class="form-label">ID Discord</label><input class="form-input" id="nm-discord" placeholder="Ex: 123456789012345678"/></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Pseudo Discord</label><input class="form-input" id="nm-name" placeholder="Ex: Lobo_13"/></div>
+      <div class="form-group"><label class="form-label">Prénom RP</label><input class="form-input" id="nm-rp" placeholder="Ex: Lobo"/></div>
+    </div>
+    <div class="form-group"><label class="form-label">Rôle</label>
+      <select class="form-input" id="nm-role">
+        <option value="member">Membre</option>
+        <option value="admin">Administrateur</option>
+      </select>
+    </div>
+    <button class="btn btn-primary" style="width:100%" onclick="addMember()">➕ Ajouter le membre</button>
+  `);
+}
+function addMember(){
+  const discordId=document.getElementById('nm-discord')?.value.trim();
+  const name=document.getElementById('nm-name')?.value.trim();
+  const rp=document.getElementById('nm-rp')?.value.trim();
+  const role=document.getElementById('nm-role')?.value;
+  if(!discordId||!name||!rp){toast('Remplissez tous les champs','warn');return;}
+  if(state.members.find(m=>m.discordId===discordId)){toast('Membre déjà existant','warn');return;}
+  const av=name.substring(0,2).toUpperCase();
+  state.members.push({id:discordId,discordId,name,rp,role,avatar:av,joined:new Date().toLocaleDateString('fr-FR'),banned:false});
+  addLog(state.user.name,`Nouveau membre ajouté : ${name}`,'member','👤');
+  toast('Membre ajouté !','success');
+  closeModalDirect();showPage('members');
+}
+function toggleBan(id){
+  const m=state.members.find(m=>m.id===id);
+  if(!m) return;
+  m.banned=!m.banned;
+  addLog(state.user.name,`${m.name} ${m.banned?'banni':'débanni'}`,'member',m.banned?'🚫':'✅');
+  toast(`${m.name} ${m.banned?'banni':'débanni'}`,'warn');
+  showPage('members');
+}
+function changeRole(id){
+  const m=state.members.find(m=>m.id===id);
+  if(!m) return;
+  m.role=m.role==='admin'?'member':'admin';
+  addLog(state.user.name,`${m.name} passé ${m.role==='admin'?'administrateur':'membre'}`,'member','⭐');
+  toast(`Rôle modifié`,'info');
+  showPage('members');
+}
+function deleteMember(id){
+  const m=state.members.find(m=>m.id===id);
+  if(!m||!confirm(`Supprimer ${m.name} ?`)) return;
+  state.members=state.members.filter(m=>m.id!==id);
+  addLog(state.user.name,`Membre supprimé : ${m.name}`,'member','🗑');
+  toast('Membre supprimé','warn');
+  showPage('members');
+}
+
+// ==================== BOT DISCORD ====================
+function pageBot(){
+  const members=state.members.filter(m=>!m.banned);
+  return `
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+    <div class="card">
+      <div class="card-header"><div class="card-title">Envoyer un <span>message</span></div></div>
+      <div class="info-box">Le bot enverra le message en MP au membre sélectionné au nom du Cartel.</div>
+      <div class="form-group"><label class="form-label">Destinataire</label>
+        <select class="form-input" id="bot-target">
+          <option value="">— Sélectionner un membre —</option>
+          ${members.map(m=>`<option value="${m.discordId}">${m.name} (${m.rp})</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">Message</label>
+        <textarea class="form-input" id="bot-msg" rows="5" placeholder="Écrivez votre message ici...&#10;&#10;Le bot l'enverra en votre nom."></textarea>
+      </div>
+      <button class="btn btn-primary" style="width:100%" onclick="sendBotMsg()">📨 Envoyer via le Bot</button>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">Messages <span>envoyés</span></div></div>
+      <div id="bot-sent-log">
+        ${state.logs.filter(l=>l.type==='bot').map(l=>`
+          <div class="log-entry">
+            <div class="log-time">${l.time}</div>
+            <div class="log-text"><strong>${l.user}</strong> — ${l.action}</div>
+          </div>`).join('')||`<div class="empty-state" style="padding:30px"><p>Aucun message envoyé</p></div>`}
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:0">
+    <div class="card-header"><div class="card-title">Webhook <span>Discord</span></div></div>
+    <div class="info-box">Configurez le webhook pour recevoir les notifications de commandes dans votre salon Discord.</div>
+    <div class="form-group"><label class="form-label">URL du Webhook</label>
+      <input class="form-input" id="wh-url" value="${state.settings.discordWebhook}" placeholder="https://discord.com/api/webhooks/..."/>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">ID du Serveur</label>
+        <input class="form-input" id="wh-server" value="${state.settings.discordServerId}" placeholder="ID du serveur Discord"/>
+      </div>
+      <div class="form-group"><label class="form-label">Token du Bot</label>
+        <input class="form-input" type="password" id="wh-token" value="${state.settings.discordBotToken}" placeholder="Token du bot Discord"/>
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="saveWebhook()">💾 Enregistrer</button>
+    <button class="btn btn-outline" style="margin-left:10px" onclick="testWebhook()">🧪 Tester</button>
+  </div>`;
+}
+function sendBotMsg(){
+  const target=document.getElementById('bot-target')?.value;
+  const msg=document.getElementById('bot-msg')?.value.trim();
+  if(!target||!msg){toast('Sélectionnez un membre et écrivez un message','warn');return;}
+  const member=state.members.find(m=>m.discordId===target);
+  addLog(state.user.name,`Message bot envoyé à ${member?.name||target} : "${msg.substring(0,40)}..."`,'bot','🤖');
+  toast(`Message envoyé à ${member?.name} via le bot Discord`,'success');
+  document.getElementById('bot-msg').value='';
+  document.getElementById('bot-target').value='';
+  showPage('bot');
+}
+function saveWebhook(){
+  state.settings.discordWebhook=document.getElementById('wh-url')?.value;
+  state.settings.discordServerId=document.getElementById('wh-server')?.value;
+  state.settings.discordBotToken=document.getElementById('wh-token')?.value;
+  addLog(state.user.name,'Configuration Discord mise à jour','admin','⚙️');
+  toast('Configuration sauvegardée','success');
+}
+function testWebhook(){toast('Test webhook envoyé au salon Discord','info');}
+
+// ==================== LOGS ====================
+function pageLogs(){
+  const types=['all','order','accept','deliver','admin','member','bot','refuse'];
+  return `
+  <div class="tabs" id="log-tabs">
+    ${types.map((t,i)=>`<div class="tab${i===0?' active':''}" onclick="filterLogs('${t}',this)">${t==='all'?'Tous':t==='order'?'Commandes':t==='accept'?'Acceptées':t==='deliver'?'Livrées':t==='admin'?'Admin':t==='member'?'Membres':t==='bot'?'Bot':'Refusées'}</div>`).join('')}
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Logs <span>Système</span></div>
+      <div style="font-size:12px;color:var(--text3)">${state.logs.length} entrées</div>
+    </div>
+    <div id="logs-list">${renderLogs('all')}</div>
+  </div>`;
+}
+function filterLogs(type,el){
+  document.querySelectorAll('#log-tabs .tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('logs-list').innerHTML=renderLogs(type);
+}
+function renderLogs(type){
+  const logs=type==='all'?state.logs:state.logs.filter(l=>l.type===type);
+  if(!logs.length) return `<div class="empty-state" style="padding:30px"><p>Aucun log</p></div>`;
+  return logs.map(l=>`
+    <div class="log-entry">
+      <div class="log-time">${l.time}</div>
+      <div class="log-icon" style="background:var(--bg3)">${l.icon}</div>
+      <div class="log-text"><strong>${l.user}</strong> — ${l.action}</div>
+    </div>`).join('');
+}
+
+// ==================== SETTINGS ====================
+function pageSettings(){
+  return `
+  <div class="tabs" id="set-tabs">
+    <div class="tab active" onclick="showSettingsTab('general',this)">Général</div>
+    <div class="tab" onclick="showSettingsTab('appearance',this)">Apparence</div>
+    <div class="tab" onclick="showSettingsTab('security',this)">Sécurité</div>
+  </div>
+  <div id="settings-content">${renderSettingsGeneral()}</div>`;
+}
+function showSettingsTab(tab,el){
+  document.querySelectorAll('#set-tabs .tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  const map={general:renderSettingsGeneral,appearance:renderSettingsAppearance,security:renderSettingsSecurity};
+  document.getElementById('settings-content').innerHTML=(map[tab]||renderSettingsGeneral)();
+}
+function renderSettingsGeneral(){
+  return `<div class="card">
+    <div class="card-header"><div class="card-title">Paramètres <span>Généraux</span></div></div>
+    <div class="form-group"><label class="form-label">Nom du site</label><input class="form-input" id="s-name" value="${state.settings.siteName}"/></div>
+    <div class="form-group"><label class="form-label">Message d'accueil</label><textarea class="form-input" id="s-welcome" rows="3">${state.settings.welcomeText}</textarea></div>
+    <button class="btn btn-primary" onclick="saveGeneral()">💾 Sauvegarder</button>
+  </div>`;
+}
+function renderSettingsAppearance(){
+  const wallpaper=WALLPAPERS.find(w=>w.url===state.settings.wallpaper)||WALLPAPERS[0];
+  return `<div class="card">
+    <div class="card-header"><div class="card-title">Fond d'<span>écran</span></div></div>
+    <div class="wallpaper-preview" style="background-image:url(${state.settings.wallpaper||''})">
+      <span style="font-size:11px;color:#fff;background:rgba(0,0,0,.5);padding:4px 8px">Aperçu</span>
+    </div>
+    <div class="wallpaper-row">
+      ${WALLPAPERS.map(w=>`<div class="wallpaper-thumb ${w.url===state.settings.wallpaper?'selected':''}" 
+        style="background-image:url(${w.url?w.url+',':''});background-color:var(--bg3)"
+        onclick="selectWallpaper('${w.url}')" title="${w.label}">${w.url?'':'🚫'}</div>`).join('')}
+    </div>
+    <div class="form-group" style="margin-top:16px">
+      <label class="form-label">Opacité du fond (${Math.round(state.settings.wallpaperOpacity*100)}%)</label>
+      <input type="range" class="form-input" min="0" max="0.5" step="0.01" id="s-opacity" value="${state.settings.wallpaperOpacity}" oninput="previewOpacity(this.value)" style="padding:4px 0;border:none;background:none"/>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="card-title">Couleur <span>accent</span></div></div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      ${ACCENT_COLORS.map(c=>`<div class="color-swatch ${c===state.settings.accentColor?'selected':''}" style="background:${c};border-color:${c===state.settings.accentColor?'#fff':'transparent'}" onclick="selectAccent('${c}')"></div>`).join('')}
+    </div>
+  </div>
+  <button class="btn btn-primary" onclick="saveAppearance()">💾 Sauvegarder l'apparence</button>`;
+}
+function renderSettingsSecurity(){
+  return `<div class="card">
+    <div class="card-header"><div class="card-title">Sécurité & <span>Accès</span></div></div>
+    <div class="info-box warn">⚠️ Ces paramètres contrôlent l'accès au panel admin. Soyez prudent.</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border)">
+      <div><div style="font-size:13px">Authentification Discord obligatoire</div><div style="font-size:11px;color:var(--text3)">Tous les utilisateurs doivent se connecter avec Discord</div></div>
+      <label class="toggle"><input type="checkbox" checked disabled/><span class="toggle-slider"></span></label>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border)">
+      <div><div style="font-size:13px">Logs des connexions</div><div style="font-size:11px;color:var(--text3)">Enregistrer toutes les connexions au panel</div></div>
+      <label class="toggle"><input type="checkbox" checked/><span class="toggle-slider"></span></label>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0">
+      <div><div style="font-size:13px">Notification webhook sur connexion admin</div><div style="font-size:11px;color:var(--text3)">Alerter Discord lors de chaque accès admin</div></div>
+      <label class="toggle"><input type="checkbox"/><span class="toggle-slider"></span></label>
+    </div>
+  </div>`;
+}
+function selectWallpaper(url){
+  state.settings.wallpaper=url;
+  applyWallpaper();
+  showSettingsTab('appearance',document.querySelectorAll('#set-tabs .tab')[1]);
+}
+function previewOpacity(val){
+  state.settings.wallpaperOpacity=parseFloat(val);
+  applyWallpaper();
+}
+function selectAccent(color){
+  state.settings.accentColor=color;
+  applyWallpaper();
+  showSettingsTab('appearance',document.querySelectorAll('#set-tabs .tab')[1]);
+}
+function saveGeneral(){
+  state.settings.siteName=document.getElementById('s-name')?.value||'Cartel 13';
+  state.settings.welcomeText=document.getElementById('s-welcome')?.value||'';
+  addLog(state.user.name,'Paramètres généraux mis à jour','admin','⚙️');
+  toast('Paramètres sauvegardés','success');
+}
+function saveAppearance(){
+  state.settings.wallpaperOpacity=parseFloat(document.getElementById('s-opacity')?.value||'0.15');
+  applyWallpaper();
+  addLog(state.user.name,'Apparence du site modifiée','admin','🎨');
+  toast('Apparence sauvegardée','success');
+}
+
+// ==================== MODAL ====================
+function openModal(title,body){
+  document.getElementById('modal-title').textContent=title;
+  document.getElementById('modal-body').innerHTML=body;
+  document.getElementById('modal-overlay').classList.remove('hidden');
+}
+function closeModal(e){
+  if(e.target===document.getElementById('modal-overlay')) closeModalDirect();
+}
+function closeModalDirect(){
+  document.getElementById('modal-overlay').classList.add('hidden');
+}
+
+// ==================== HELPERS ====================
+function badgeStatus(s){
+  const map={pending:'badge-pending',accepted:'badge-accepted',delivered:'badge-delivered',refused:'badge-refused'};
+  const labels={pending:'En attente',accepted:'Acceptée',delivered:'Livrée',refused:'Refusée'};
+  return `<span class="badge ${map[s]||''}">${labels[s]||s}</span>`;
+}
+function badgeCurrency(c){
+  return c==='dirty'?'<span class="badge badge-dirty">💰 Sale</span>':'<span class="badge badge-clean">💵 Propre</span>';
+}
+function badgeRole(r){
+  return r==='admin'?'<span class="badge badge-admin">Admin</span>':'<span class="badge badge-member">Membre</span>';
+}
+
+// INIT
+window.addEventListener('DOMContentLoaded',()=>{
+  // Auto-show login
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+{
+  "name": "cartel13-erp",
+  "version": "1.0.0",
+  "description": "Cartel 13 — ERP Nova Life",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
